@@ -1,0 +1,24 @@
+{
+  "name": "testrunner",
+  "version": "1.0.0",
+  "description": "Automated Test Runner for JS Products",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "@babel/preset-env": "^7.5.5",
+    "babel-core": "^6.26.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/makerdao/testrunner.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/makerdao/testrunner/issues"
+  },
+  "homepage": "https://github.com/makerdao/testrunner#readme"
+}
