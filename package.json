@@ -10,7 +10,8 @@
     "babel-jest": "^24.9.0"
   },
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "babel-confirm": "node ./utilities/setup/babelConfirm.js"
   },
   "jest": {
     "transform": {
