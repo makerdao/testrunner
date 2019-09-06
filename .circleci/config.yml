@@ -2,7 +2,9 @@
  jobs:
    build:
      docker:
-       - image: circleci/ruby:2.4.1
+       - image: circleci/node:lts
      steps:
        - checkout
-       - run: echo "A first hello"
+       - run: npm i -g yarn
+       - run: yarn
+       - run: yarn test
