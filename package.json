@@ -4,6 +4,7 @@
   "description": "Automated Test Runner for JS Products",
   "main": "index.js",
   "dependencies": {
+    "@babel/runtime": "^7.6.0",
     "jest": "^24.9.0"
   },
   "devDependencies": {
