@@ -7,33 +7,47 @@ export default class Engine {
 
   }
 
-  run({ plans, planLiterals }) { // eslint-disable-line no-unused-vars
-    // specify plans or actions, not both
+  run({ plans, actions, actors }) { // eslint-disable-line no-unused-vars
+    // specify plans or actions/actors, not both
 
     // run the plans
     // for each plan:
     // initialize the users needed
     // run the actions in order, passing user as argument
-    let actors = {}, actions = [], results = [];
+
+    let results = [];
+    let items = actions ? [ ...actions ] : [];
+    let users = actors ? this._setUsers(actors) : {};
 
     if (plans) {
       plans.forEach(plan => {
         const importedPlan = (require(`./plans/${plan}.js`)).default;
-        Object.keys(importedPlan.actors).forEach(name => {
-          actors[name] = (require(`./actors/${importedPlan.actors[name]}`)).default;
-        });
+        users = this._setUsers(importedPlan.actors);
         importedPlan.actions.forEach(action => {
-          actions.push(action);
+          items.push(action);
         });
       });
     }
 
-    actions.forEach(async action => {
+    items.forEach(async action => {
+      let result;
       const importedAction = (require(`./actions/${action[1]}`)).default;
-      const result = await importedAction.operation(actors[action[0]], action[0]);
+      try {
+        result = await importedAction.operation(users[action[0]], action[0]);
+      } catch (err) {
+        console.error(err);
+      }
       results.push(result);
     });
 
     return { results, success: true };
+  }
+
+  _setUsers(actors) {
+    let users = {};
+    Object.keys(actors).forEach(name => {
+      users[name] = (require(`./actors/${actors[name]}`)).default;
+    });
+    return users;
   }
 }
