@@ -1,6 +1,6 @@
 import Engine from '../src/engine';
 
-test('engine can run a simple plan', async () => {
+test.only('engine can run a simple plan', async () => {
   const engine = new Engine();
   const report = await engine.run({
     plan: 'self-test'
