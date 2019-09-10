@@ -19,7 +19,8 @@ export default class Engine {
 
     let report = {
       results: [],
-      success: true
+      success: true,
+      completed: []
     }
     let items = actions ? [ ...actions ] : [];
     let users = actors ? this._importUsers(actors) : {};
@@ -37,13 +38,11 @@ export default class Engine {
         try {
           const result = await this._runAction(importedAction, importedUser, item[0]);
           report.results.push(result);
+          report.completed.push(item);
         } catch (err) {
           report.success = false;
-          report.errors = {
-            action: item,
-            message: err.message,
-            errorIndex: 0 + report.results.length
-          };
+          report.error = err;
+          report.errorIndex = 0 + report.results.length;
         }
       }
     }
@@ -77,6 +76,7 @@ export default class Engine {
   }
 
   async _runAction(action, actor, name) {
+    if (action.before) await action.before(actor, name);
     return await action.operation(actor, name);
   }
 }
