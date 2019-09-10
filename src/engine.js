@@ -77,6 +77,8 @@ export default class Engine {
 
   async _runAction(action, actor, name) {
     if (action.before) await action.before(actor, name);
-    return await action.operation(actor, name);
+    const result = await action.operation(actor, name);
+    if (action.after) await action.after(actor, name);
+    return result;
   }
 }

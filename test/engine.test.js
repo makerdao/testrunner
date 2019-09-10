@@ -44,20 +44,21 @@ test('fail before', async () => {
   });
 });
 
-// test('fail after', async () => {
-//   const engine = new Engine();
-//   const report = await engine.run({
-//     actors: { user1: 'cdpUser' },
-//     actions: [
-//       ['user1', 'checkUser'],
-//       ['user1', 'failAfter'],
-//       ['user1', 'checkUser']
-//     ]
-//   });
-//   expect(report).toEqual({
-//     success: false,
-//     error: expect.any(Error),
-//     errorIndex: 1,
-//     results: ['0xa']
-//   });
-// });
+test('fail after', async () => {
+  const engine = new Engine();
+  const report = await engine.run({
+    actors: { user1: 'cdpUser' },
+    actions: [
+      ['user1', 'checkUser'],
+      ['user1', 'failAfter'],
+      ['user1', 'checkUser']
+    ]
+  });
+  expect(report).toEqual({
+    success: false,
+    error: expect.any(Error),
+    errorIndex: 1,
+    results: ['0xa'],
+    completed: [['user1', 'checkUser']]
+  });
+});
