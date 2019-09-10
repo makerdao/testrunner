@@ -1,6 +1,6 @@
 export default {
-  operation: async user => {
-    return user.privateKey;
+  operation: async (user, name) => {
+    return user.privateKey(name);
   },
   category: 'self-test'
 };

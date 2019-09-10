@@ -14,18 +14,26 @@ export default class Engine {
     // for each plan:
     // initialize the users needed
     // run the actions in order, passing user as argument
-    let actors = {}, actions = [];
+    let actors = {}, actions = [], results = [];
 
     if (plans) {
       plans.forEach(plan => {
         const importedPlan = (require(`./plans/${plan}.js`)).default;
         Object.keys(importedPlan.actors).forEach(name => {
-          actors[name] = importedPlan.actors[name];
+          actors[name] = (require(`./actors/${importedPlan.actors[name]}`)).default;
         });
         importedPlan.actions.forEach(action => {
           actions.push(action);
         });
       });
     }
+
+    actions.forEach(async action => {
+      const importedAction = (require(`./actions/${action[1]}`)).default;
+      const result = await importedAction.operation(actors[action[0]], action[0]);
+      results.push(result);
+    });
+
+    return { results, success: true };
   }
 }
