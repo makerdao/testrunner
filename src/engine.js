@@ -1,8 +1,7 @@
-import ErrorWithStack from "jest-util/build/ErrorWithStack";
-
 // this is the part that pulls in all the dependencies
 // so that actors and actions don't have to handle
 // their own imports
+import cdpUser from './actors/cdpUser';
 
 export default class Engine {
   constructor() {
@@ -36,7 +35,7 @@ export default class Engine {
         const importedAction = (require(`./actions/${item[1]}`)).default;
         const importedUser = users[item[0]]
         try {
-          const result = await this._runAction(importedAction, importedUser, item[0]);
+          const result = await this._runAction(importedAction, importedUser);
           report.results.push(result);
           report.completed.push(item);
         } catch (err) {
@@ -53,7 +52,7 @@ export default class Engine {
   _importUsers(actors) {
     let users = {};
     Object.keys(actors).forEach(name => {
-      users[name] = (require(`./actors/${actors[name]}`)).default;
+      users[name] = this._actorsMap()[actors[name]](name);
     });
     return users;
   }
@@ -75,10 +74,16 @@ export default class Engine {
     }
   }
 
-  async _runAction(action, actor, name) {
-    if (action.before) await action.before(actor, name);
-    const result = await action.operation(actor, name);
-    if (action.after) await action.after(actor, name);
+  _actorsMap() {
+    return {
+      'cdpUser': cdpUser
+    }
+  }
+
+  async _runAction(action, actor) {
+    if (action.before) await action.before(actor);
+    const result = await action.operation(actor);
+    if (action.after) await action.after(actor);
     return result;
   }
 }
