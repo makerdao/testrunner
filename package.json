@@ -18,8 +18,7 @@
   },
   "scripts": {
     "test": "jest",
-    "babel-confirm": "node ./utilities/setup/babelConfirm.js",
-    "precommit": "lint-staged"
+    "babel-confirm": "node ./utilities/setup/babelConfirm.js"
   },
   "jest": {
     "transform": {
@@ -30,8 +29,13 @@
     "type": "git",
     "url": "git+https://github.com/makerdao/testrunner.git"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
   "lint-staged": {
-    "*.js": [
+    "./**/*.js": [
       "prettier --single-quote --write",
       "git add"
     ]

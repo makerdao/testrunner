@@ -5,6 +5,7 @@ test('engine can run a simple plan (plans)', async () => {
   const report = await engine.run({
     plans: ['self-test']
   });
+
   expect(report).toEqual({
     success: true,
     results: ['0xa'],
