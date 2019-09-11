@@ -11,7 +11,9 @@
     "@babel/plugin-transform-runtime": "^7.6.0",
     "@babel/preset-env": "^7.5.5",
     "babel-core": "^6.26.3",
-    "babel-jest": "^24.9.0"
+    "babel-jest": "^24.9.0",
+    "lint-staged": "^9.2.5",
+    "prettier": "^1.18.2"
   },
   "scripts": {
     "test": "jest",
@@ -25,6 +27,11 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/makerdao/testrunner.git"
+  },
+  "lint-staged": {
+    "./**/*.js": [
+      "prettier --single-quote --write"
+    ]
   },
   "author": "",
   "license": "ISC",

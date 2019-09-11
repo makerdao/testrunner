@@ -1,13 +1,19 @@
 import ACTORS from './actors/index';
 import ACTIONS from './actions/index';
 import PLANS from './plans/index';
+import assert from 'assert';
 
 export default class Engine {
   constructor() {
 
   }
 
-  async run({ plans, actions, actors }) {
+  async run({ plans, actions, actors } = {}) {
+    assert(
+      (plans || actors && actions) && Object.keys(arguments[0]).length < 3,
+      'must provide plans or actors/actions (but not both)'
+    );
+
     const plan = plans ? this._importPlans(plans) : null;
     actions = actions ? [ ...actions ] : plan.actions;
     actors = actors ? this._importActors(actors) : plan.actors;
