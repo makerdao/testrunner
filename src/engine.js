@@ -1,5 +1,6 @@
 import ACTORS from './actors/index';
 import ACTIONS from './actions/index';
+import PLANS from './plans/index';
 
 export default class Engine {
   constructor() {
@@ -58,7 +59,7 @@ export default class Engine {
     let actions = [];
 
     plans.forEach(plan => {
-      const importedPlan = (require(`./plans/${plan}.js`)).default;
+      const importedPlan = PLANS[plan];
       actors = this._importActors(importedPlan.actors);
       importedPlan.actions.forEach(action => {
         actions.push(action);
