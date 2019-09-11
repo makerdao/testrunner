@@ -5,29 +5,29 @@ import assert from 'assert';
 
 export default class Engine {
   constructor() {
-
+    // Set up staxx here
   }
 
   async run({ plans, actions, actors } = {}) {
     assert(
-      (plans || actors && actions) && Object.keys(arguments[0]).length < 3,
+      (plans || (actors && actions)) && Object.keys(arguments[0]).length < 3,
       'must provide plans or actors/actions (but not both)'
     );
 
     const plan = plans ? this._importPlans(plans) : null;
-    actions = actions ? [ ...actions ] : plan.actions;
+    actions = actions ? actions : plan.actions;
     actors = actors ? this._importActors(actors) : plan.actors;
 
     let report = {
       results: [],
       success: true,
       completed: []
-    }
+    };
 
     for (const action of actions) {
       if (report.success) {
         const importedAction = ACTIONS[action[1]];
-        const importedActor = actors[action[0]]
+        const importedActor = actors[action[0]];
         try {
           const result = await this._runAction(importedAction, importedActor);
           report.results.push(result);
@@ -39,7 +39,7 @@ export default class Engine {
         }
       }
     }
-    
+
     return report;
   }
 
@@ -75,6 +75,6 @@ export default class Engine {
     return {
       actors: actors,
       actions: actions
-    }
+    };
   }
 }
