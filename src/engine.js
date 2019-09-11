@@ -7,23 +7,24 @@ export default class Engine {
   }
 
   async run({ plans, actions, actors }) {
+    const plan = plans ? this._importPlans(plans) : null;
+    actions = actions ? [ ...actions ] : plan.actions;
+    actors = actors ? this._importActors(actors) : plan.actors;
+
     let report = {
       results: [],
       success: true,
       completed: []
     }
-    const plan = plans ? this._importPlans(plans) : null;
-    const items = actions ? [ ...actions ] : plan.items;
-    const users = actors ? this._importUsers(actors) : plan.users;
 
-    for (const item of items) {
+    for (const action of actions) {
       if (report.success) {
-        const importedAction = ACTIONS[item[1]];
-        const importedUser = users[item[0]]
+        const importedAction = ACTIONS[action[1]];
+        const importedActor = actors[action[0]]
         try {
-          const result = await this._runAction(importedAction, importedUser);
+          const result = await this._runAction(importedAction, importedActor);
           report.results.push(result);
-          report.completed.push(item);
+          report.completed.push(action);
         } catch (err) {
           report.success = false;
           report.error = err;
@@ -42,31 +43,31 @@ export default class Engine {
     return result;
   }
 
-  _importUsers(actors) {
-    let users = {};
+  _importActors(actors) {
+    let importedActors = {};
 
     Object.keys(actors).forEach(name => {
-      users[name] = ACTORS[actors[name]](name);
+      importedActors[name] = ACTORS[actors[name]](name);
     });
 
-    return users;
+    return importedActors;
   }
 
   _importPlans(plans) {
-    let users = {};
-    let items = [];
+    let actors = {};
+    let actions = [];
 
     plans.forEach(plan => {
       const importedPlan = (require(`./plans/${plan}.js`)).default;
-      users = this._importUsers(importedPlan.actors);
+      actors = this._importActors(importedPlan.actors);
       importedPlan.actions.forEach(action => {
-        items.push(action);
+        actions.push(action);
       });
     });
 
     return {
-      users: users,
-      items: items
+      actors: actors,
+      actions: actions
     }
   }
 }
