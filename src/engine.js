@@ -1,6 +1,6 @@
-import ACTORS from './actors/index';
-import ACTIONS from './actions/index';
-import PLANS from './plans/index';
+import ACTORS from './actors';
+import ACTIONS from './actions';
+import PLANS from './plans';
 import assert from 'assert';
 
 export default class Engine {
@@ -51,13 +51,10 @@ export default class Engine {
   }
 
   _importActors(actors) {
-    let importedActors = {};
-
-    Object.keys(actors).forEach(name => {
-      importedActors[name] = ACTORS[actors[name]](name);
-    });
-
-    return importedActors;
+    return Object.keys(actors).reduce((result, name) => {
+      result[name] = ACTORS[actors[name]](name);
+      return result;
+    }, {});
   }
 
   _importPlans(plans) {
