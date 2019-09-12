@@ -1,5 +1,5 @@
-import cdpUser from './cdpUser';
+import selfTestUser from './selfTestUser';
 
 export default {
-  cdpUser
+  selfTestUser
 };

@@ -1,6 +1,6 @@
 export default {
   actors: {
-    user1: 'cdpUser'
+    user1: 'selfTestUser'
   },
   actions: [['user1', 'checkUser']]
 };

@@ -16,7 +16,7 @@ test('engine can run a simple plan (plans)', async () => {
 test('engine can run a simple plan (actors, actions)', async () => {
   const engine = new Engine();
   const report = await engine.run({
-    actors: { user1: 'cdpUser' },
+    actors: { user1: 'selfTestUser' },
     actions: [['user1', 'checkUser']]
   });
   expect(report).toEqual({
@@ -29,7 +29,7 @@ test('engine can run a simple plan (actors, actions)', async () => {
 test('fail before', async () => {
   const engine = new Engine();
   const report = await engine.run({
-    actors: { user1: 'cdpUser' },
+    actors: { user1: 'selfTestUser' },
     actions: [
       ['user1', 'checkUser'],
       ['user1', 'failBefore'],
@@ -48,7 +48,7 @@ test('fail before', async () => {
 test('fail after', async () => {
   const engine = new Engine();
   const report = await engine.run({
-    actors: { user1: 'cdpUser' },
+    actors: { user1: 'selfTestUser' },
     actions: [
       ['user1', 'checkUser'],
       ['user1', 'failAfter'],
