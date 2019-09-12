@@ -3,7 +3,7 @@ import Engine from '../src/engine';
 test('engine can run a simple plan (plans)', async () => {
   const engine = new Engine();
   const report = await engine.run({
-    plans: ['self-test']
+    plans: ['selfTest']
   });
 
   expect(report).toEqual({

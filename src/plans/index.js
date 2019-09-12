@@ -1,5 +1,5 @@
-import selfTest from './self-test';
+import selfTest from './selfTest';
 
 export default {
-  'self-test': selfTest
+  selfTest
 };
