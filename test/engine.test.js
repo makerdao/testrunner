@@ -1,32 +1,35 @@
 import Engine from '../src/engine';
 
-test('engine can run a simple plan', async () => {
+test('engine can run a simple plan (plans)', async () => {
   const engine = new Engine();
   const report = await engine.run({
-    plan: 'self-test'
+    plans: ['selfTest']
   });
+
   expect(report).toEqual({
     success: true,
-    results: ['0xa']
+    results: ['0xa'],
+    completed: [['user1', 'checkUser']]
   });
 });
 
-test('engine can run a simple plan', async () => {
+test('engine can run a simple plan (actors, actions)', async () => {
   const engine = new Engine();
   const report = await engine.run({
-    actors: { user1: 'cdpUser' },
+    actors: { user1: 'selfTestUser' },
     actions: [['user1', 'checkUser']]
   });
   expect(report).toEqual({
     success: true,
-    results: ['0xa']
+    results: ['0xa'],
+    completed: [['user1', 'checkUser']]
   });
 });
 
 test('fail before', async () => {
   const engine = new Engine();
   const report = await engine.run({
-    actors: { user1: 'cdpUser' },
+    actors: { user1: 'selfTestUser' },
     actions: [
       ['user1', 'checkUser'],
       ['user1', 'failBefore'],
@@ -37,14 +40,15 @@ test('fail before', async () => {
     success: false,
     error: expect.any(Error),
     errorIndex: 1,
-    results: ['0xa']
+    results: ['0xa'],
+    completed: [['user1', 'checkUser']]
   });
 });
 
 test('fail after', async () => {
   const engine = new Engine();
   const report = await engine.run({
-    actors: { user1: 'cdpUser' },
+    actors: { user1: 'selfTestUser' },
     actions: [
       ['user1', 'checkUser'],
       ['user1', 'failAfter'],
@@ -55,6 +59,7 @@ test('fail after', async () => {
     success: false,
     error: expect.any(Error),
     errorIndex: 1,
-    results: ['0xa']
+    results: ['0xa'],
+    completed: [['user1', 'checkUser']]
   });
 });

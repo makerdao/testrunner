@@ -1,5 +1,6 @@
 export default {
   before: () => {},
+  // prettier-ignore
   operation: (user, maker) => { // eslint-disable-line no-unused-vars
     // use dai.js to open a cdp for the user
     // create a proxy as necessary
