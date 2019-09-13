@@ -1,5 +1,7 @@
-import selfTest from './selfTest';
+import selfTestA from './selfTestA';
+import selfTestB from './selfTestB';
 
 export default {
-  selfTest
+  selfTestA,
+  selfTestB
 };

@@ -3,7 +3,7 @@ import Engine from '../src/engine';
 test('engine can run a simple plan', async () => {
   const engine = new Engine();
   const report = await engine.run({
-    plans: ['selfTest']
+    plans: ['selfTestA']
   });
 
   expect(report).toEqual({
@@ -13,16 +13,20 @@ test('engine can run a simple plan', async () => {
   });
 });
 
-test('engine can run multiple plans', async () => {
+test('engine can run multiple simple plans', async () => {
   const engine = new Engine();
   const report = await engine.run({
-    plans: ['selfTest', 'selfTest']
+    plans: ['selfTestA', 'selfTestB']
   });
 
   expect(report).toEqual({
-    results: ['0xa', '0xa'],
+    results: ['0xa', '0xa', '0xb'],
     success: true,
-    completed: [['user1', 'checkUser'], ['user1', 'checkUser']]
+    completed: [
+      ['user1', 'checkUser'],
+      ['user1', 'checkUser'],
+      ['user2', 'checkUser']
+    ]
   });
 });
 
@@ -32,6 +36,7 @@ test('engine can run an explicit series of actors and actions', async () => {
     actors: { user1: 'selfTestUser' },
     actions: [['user1', 'checkUser']]
   });
+
   expect(report).toEqual({
     success: true,
     results: ['0xa'],
@@ -49,6 +54,7 @@ test('fail before', async () => {
       ['user1', 'checkUser']
     ]
   });
+
   expect(report).toEqual({
     success: false,
     error: expect.any(Error),
@@ -68,6 +74,7 @@ test('fail after', async () => {
       ['user1', 'checkUser']
     ]
   });
+
   expect(report).toEqual({
     success: false,
     error: expect.any(Error),

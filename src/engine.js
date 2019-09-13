@@ -11,7 +11,7 @@ export default class Engine {
   async run({ plans, actions, actors } = {}) {
     assert(
       (plans || (actors && actions)) && Object.keys(arguments[0]).length < 3,
-      'must provide plans or actors/actions (but not both)'
+      'Must provide plans or actors/actions (but not both)'
     );
 
     const plan = plans ? this._importPlans(plans) : null;
@@ -27,7 +27,9 @@ export default class Engine {
     for (const action of actions) {
       if (report.success) {
         const importedAction = ACTIONS[action[1]];
+        assert(importedAction, `Could not import action: ${action[1]}`);
         const importedActor = actors[action[0]];
+
         try {
           const result = await this._runAction(importedAction, importedActor);
           report.results.push(result);
@@ -52,7 +54,13 @@ export default class Engine {
 
   _importActors(actors) {
     return Object.keys(actors).reduce((result, name) => {
+      assert(
+        ACTORS[actors[name]],
+        `Could not import actor: { ${name}: ${actors[name]} }`
+      );
       result[name] = ACTORS[actors[name]](name);
+      if (!result[name].privateKey)
+        console.warn(`{ ${name}: ${actors[name]} } has no private key!`);
       return result;
     }, {});
   }
@@ -61,6 +69,8 @@ export default class Engine {
     return plans.reduce(
       (result, plan) => {
         const importedPlan = PLANS[plan];
+        assert(importedPlan, `Could not import plan: ${plan}`);
+
         result.actors = {
           ...result.actors,
           ...this._importActors(importedPlan.actors)
@@ -68,6 +78,7 @@ export default class Engine {
         importedPlan.actions.forEach(action => {
           result.actions.push(action);
         });
+
         return result;
       },
       { actors: {}, actions: [] }
