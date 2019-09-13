@@ -58,20 +58,19 @@ export default class Engine {
   }
 
   _importPlans(plans) {
-    let actors = {};
-    let actions = [];
-
-    plans.forEach(plan => {
-      const importedPlan = PLANS[plan];
-      actors = this._importActors(importedPlan.actors);
-      importedPlan.actions.forEach(action => {
-        actions.push(action);
-      });
-    });
-
-    return {
-      actors: actors,
-      actions: actions
-    };
+    return plans.reduce(
+      (result, plan) => {
+        const importedPlan = PLANS[plan];
+        result.actors = {
+          ...result.actors,
+          ...this._importActors(importedPlan.actors)
+        };
+        importedPlan.actions.forEach(action => {
+          result.actions.push(action);
+        });
+        return result;
+      },
+      { actors: {}, actions: [] }
+    );
   }
 }
