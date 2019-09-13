@@ -84,4 +84,18 @@ export default class Engine {
       { actors: {}, actions: [] }
     );
   }
+
+  _randomizer(actions) {
+    let currentIndex = actions.length,
+      temporaryValue,
+      randomIndex;
+    while (currentIndex !== 0) {
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex -= 1;
+      temporaryValue = actions[currentIndex];
+      actions[currentIndex] = actions[randomIndex];
+      actions[randomIndex] = temporaryValue;
+    }
+    return actions;
+  }
 }
