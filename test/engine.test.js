@@ -1,6 +1,6 @@
 import Engine from '../src/engine';
 
-test('engine can run a simple plan (plans)', async () => {
+test('engine can run a simple plan', async () => {
   const engine = new Engine();
   const report = await engine.run({
     plans: ['selfTest']
@@ -13,7 +13,20 @@ test('engine can run a simple plan (plans)', async () => {
   });
 });
 
-test('engine can run a simple plan (actors, actions)', async () => {
+test('engine can run multiple plans', async () => {
+  const engine = new Engine();
+  const report = await engine.run({
+    plans: ['selfTest', 'selfTest']
+  });
+
+  expect(report).toEqual({
+    results: ['0xa', '0xa'],
+    success: true,
+    completed: [['user1', 'checkUser'], ['user1', 'checkUser']]
+  });
+});
+
+test('engine can run an explicit series of actors and actions', async () => {
   const engine = new Engine();
   const report = await engine.run({
     actors: { user1: 'selfTestUser' },
