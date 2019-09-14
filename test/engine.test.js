@@ -88,8 +88,14 @@ test('randomize', () => {
   const engine = new Engine();
   const randomList1 = engine._randomize([1, 2, 3]);
   const randomList2 = engine._randomize([1, 2, 3]);
+  const randomList3 = engine._randomize([1, 2, 3]);
+  const firstElements = [randomList1, randomList2, randomList3].map(
+    randomList => {
+      return randomList[0];
+    }
+  );
 
-  expect(randomList1).not.toEqual(randomList2);
+  expect(firstElements).not.toEqual([1, 1, 1]);
 });
 
 test('engine randomizes nested actions', async () => {
