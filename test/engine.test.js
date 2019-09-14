@@ -112,3 +112,13 @@ test('engine randomizes nested actions', async () => {
   expect(report.success).toEqual(true);
   expect(report.results.length).toEqual(5);
 });
+
+test('engine randomizes nested actions from imported plans', async () => {
+  const engine = new Engine();
+  const report = await engine.run({
+    plans: ['selfTestC']
+  });
+
+  expect(report.success).toEqual(true);
+  expect(report.results.length).toEqual(5);
+});
