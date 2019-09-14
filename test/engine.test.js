@@ -84,23 +84,31 @@ test('fail after', async () => {
   });
 });
 
-test('randomizer', () => {
+test('randomize', () => {
   const engine = new Engine();
-  const randomList1 = engine._randomizer([1, 2, 3]);
-  const randomList2 = engine._randomizer([1, 2, 3]);
+  const randomList1 = engine._randomize([1, 2, 3]);
+  const randomList2 = engine._randomize([1, 2, 3]);
 
   expect(randomList1).not.toEqual(randomList2);
 });
 
-test.only('engine randomizes nested actions', async () => {
+test('engine randomizes nested actions', async () => {
   const engine = new Engine();
   const report = await engine.run({
-    actors: { user1: 'selfTestUser' },
+    actors: {
+      user1: 'selfTestUser',
+      user2: 'selfTestUser',
+      user3: 'selfTestUser',
+      user4: 'selfTestUser',
+      user5: 'selfTestUser'
+    },
     actions: [
       ['user1', 'checkUser'],
       [['user3', 'checkUser'], ['user4', 'checkUser'], ['user5', 'checkUser']],
       ['user2', 'checkUser']
     ]
   });
-  console.log(report);
+
+  expect(report.success).toEqual(true);
+  expect(report.results.length).toEqual(5);
 });

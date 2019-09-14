@@ -15,7 +15,9 @@ export default class Engine {
     );
 
     const plan = plans ? this._importPlans(plans) : null;
-    actions = actions ? actions : plan.actions;
+    actions = actions
+      ? this._randomActionCheck(actions)
+      : this._randomActionCheck(plan.actions);
     actors = actors ? this._importActors(actors) : plan.actors;
 
     let report = {
@@ -59,8 +61,9 @@ export default class Engine {
         `Could not import actor: { ${name}: ${actors[name]} }`
       );
       result[name] = ACTORS[actors[name]](name);
-      if (!result[name].privateKey)
+      if (!result[name].privateKey) {
         console.warn(`{ ${name}: ${actors[name]} } has no private key!`);
+      }
       return result;
     }, {});
   }
@@ -85,10 +88,11 @@ export default class Engine {
     );
   }
 
-  _randomizer(actions) {
+  _randomize(actions) {
     let currentIndex = actions.length,
       temporaryValue,
       randomIndex;
+
     while (currentIndex !== 0) {
       randomIndex = Math.floor(Math.random() * currentIndex);
       currentIndex -= 1;
@@ -96,6 +100,20 @@ export default class Engine {
       actions[currentIndex] = actions[randomIndex];
       actions[randomIndex] = temporaryValue;
     }
+
+    return actions;
+  }
+
+  _randomActionCheck(actions) {
+    actions.forEach((action, index) => {
+      if (typeof action[0] === 'object') {
+        const randomActions = this._randomize(action);
+        actions.splice(index, 1);
+        randomActions.forEach((randomAction, randomIndex) => {
+          actions.splice(index + randomIndex, 0, randomAction);
+        });
+      }
+    });
     return actions;
   }
 }
