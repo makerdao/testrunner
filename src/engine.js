@@ -11,7 +11,7 @@ export default class Engine {
   async run({ plans, actions, actors } = {}) {
     assert(
       (plans || (actors && actions)) && Object.keys(arguments[0]).length < 3,
-      'Must provide plans or actors/actions (but not both)'
+      'Must provide { plans } OR { actors, actions }, but not both'
     );
 
     const plan = plans ? this._importPlans(plans) : null;

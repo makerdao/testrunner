@@ -184,3 +184,31 @@ test('engine can randomize all actions when plan mode is set to random', async (
 
   expect(report1).not.toEqual(report2);
 });
+
+test('engine throws when given invalid plans, actions, or actors', async () => {
+  const params = [
+    {},
+    {
+      plans: ['selfTestA'],
+      actors: { user1: 'selfTestUser' },
+      actions: ['user1', 'checkUser']
+    },
+    { actors: { user1: 'selfTestUser' }, actions: [['user1', 'fakeAction']] },
+    { actors: { user1: 'fakeUser' }, actions: [['user1', 'checkUser']] },
+    { plans: ['fakePlan'] }
+  ];
+
+  for (const invalidParams in params) {
+    const errorMessage = await testRunError(params[invalidParams]);
+    expect(typeof errorMessage).toEqual('string');
+  }
+});
+
+async function testRunError(params) {
+  const engine = new Engine();
+  try {
+    return await engine.run(params);
+  } catch (err) {
+    return err.message;
+  }
+}
