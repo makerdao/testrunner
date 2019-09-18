@@ -114,14 +114,9 @@ export default class Engine {
     const orderedActions = [...actions];
     orderedActions.forEach((action, index) => {
       if (typeof action[0] === 'object') {
-        const randomActions = this._randomize(action);
-        orderedActions.splice(index, 1);
-        randomActions.forEach((randomAction, randomIndex) => {
-          orderedActions.splice(index + randomIndex, 0, randomAction);
-        });
+        orderedActions.splice(index, 1, ...this._randomize(action));
       }
     });
-
     return orderedActions;
   }
 }
