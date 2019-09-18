@@ -44,7 +44,7 @@ test('engine can run an explicit series of actors and actions', async () => {
   });
 });
 
-test('fail before', async () => {
+test('when engine fails before, it stops immediately and updates report with error info', async () => {
   const engine = new Engine();
   const report = await engine.run({
     actors: { user1: 'selfTestUser' },
@@ -62,9 +62,31 @@ test('fail before', async () => {
     results: ['0xa'],
     completed: [['user1', 'checkUser']]
   });
+  expect(report.error.message).toEqual('failure in before');
 });
 
-test('fail after', async () => {
+test('when engine fails during operation, it stops immediately and updates report with error info', async () => {
+  const engine = new Engine();
+  const report = await engine.run({
+    actors: { user1: 'selfTestUser' },
+    actions: [
+      ['user1', 'checkUser'],
+      ['user1', 'failDuring'],
+      ['user1', 'checkUser']
+    ]
+  });
+
+  expect(report).toEqual({
+    success: false,
+    error: expect.any(Error),
+    errorIndex: 1,
+    results: ['0xa'],
+    completed: [['user1', 'checkUser']]
+  });
+  expect(report.error.message).toEqual('failure in operation');
+});
+
+test('when engine fails after, it stops immediately and updates report with error info', async () => {
   const engine = new Engine();
   const report = await engine.run({
     actors: { user1: 'selfTestUser' },
@@ -82,9 +104,10 @@ test('fail after', async () => {
     results: ['0xa'],
     completed: [['user1', 'checkUser']]
   });
+  expect(report.error.message).toEqual('failure in after');
 });
 
-test('randomize', () => {
+test('randomize can shuffle arbitrary arrays', () => {
   const engine = new Engine();
   const randomList1 = engine._randomize([1, 2, 3]);
   const randomList2 = engine._randomize([1, 2, 3]);
@@ -98,7 +121,7 @@ test('randomize', () => {
   expect(firstElements).not.toEqual([1, 1, 1]);
 });
 
-test('engine randomizes nested actions', async () => {
+test('engine can randomize nested actions', async () => {
   const engine = new Engine();
   const actorsAndActions = {
     actors: {
@@ -138,7 +161,7 @@ test('engine randomizes nested actions', async () => {
   expect(report1).not.toEqual(report2);
 });
 
-test('engine randomizes nested actions from imported plans', async () => {
+test('engine can randomize nested actions from imported plans', async () => {
   const engine = new Engine();
   const report1 = await engine.run({ plans: ['selfTestC'] });
   let report2 = await engine.run({ plans: ['selfTestC'] });
@@ -150,7 +173,7 @@ test('engine randomizes nested actions from imported plans', async () => {
   expect(report1).not.toEqual(report2);
 });
 
-test('engine randomizes all actions when plan mode is set to random', async () => {
+test('engine can randomize all actions when plan mode is set to random', async () => {
   const engine = new Engine();
   const report1 = await engine.run({ plans: ['selfTestD'] });
   let report2 = await engine.run({ plans: ['selfTestD'] });

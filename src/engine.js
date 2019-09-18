@@ -13,7 +13,6 @@ export default class Engine {
       (plans || (actors && actions)) && Object.keys(arguments[0]).length < 3,
       'Must provide plans or actors/actions (but not both)'
     );
-    console.log(actions);
 
     const plan = plans ? this._importPlans(plans) : null;
     const orderedActions = actions
