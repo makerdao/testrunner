@@ -13,10 +13,10 @@ export default class Engine {
       (plans || (actors && actions)) && Object.keys(arguments[0]).length < 3,
       'Must provide plans or actors/actions (but not both)'
     );
+    console.log(actions);
 
     const plan = plans ? this._importPlans(plans) : null;
-    console.log(actions);
-    actions = actions
+    const orderedActions = actions
       ? this._randomActionCheck(actions)
       : this._randomActionCheck(plan.actions);
     actors = actors ? this._importActors(actors) : plan.actors;
@@ -27,7 +27,7 @@ export default class Engine {
       completed: []
     };
 
-    for (const action of actions) {
+    for (const action of orderedActions) {
       if (report.success) {
         const importedAction = ACTIONS[action[1]];
         assert(importedAction, `Could not import action: ${action[1]}`);
@@ -95,19 +95,20 @@ export default class Engine {
   }
 
   _randomize(actions) {
-    let currentIndex = actions.length,
+    const randomizedActions = [...actions];
+    let currentIndex = randomizedActions.length,
       temporaryValue,
       randomIndex;
 
     while (currentIndex !== 0) {
       randomIndex = Math.floor(Math.random() * currentIndex);
       currentIndex -= 1;
-      temporaryValue = actions[currentIndex];
-      actions[currentIndex] = actions[randomIndex];
-      actions[randomIndex] = temporaryValue;
+      temporaryValue = randomizedActions[currentIndex];
+      randomizedActions[currentIndex] = randomizedActions[randomIndex];
+      randomizedActions[randomIndex] = temporaryValue;
     }
 
-    return actions;
+    return randomizedActions;
   }
 
   _randomActionCheck(actions) {
