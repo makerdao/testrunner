@@ -112,13 +112,12 @@ test('randomize can shuffle arbitrary arrays', () => {
   const randomList1 = engine._randomize([1, 2, 3]);
   const randomList2 = engine._randomize([1, 2, 3]);
   const randomList3 = engine._randomize([1, 2, 3]);
-  const firstElements = [randomList1, randomList2, randomList3].map(
-    randomList => {
-      return randomList[0];
-    }
-  );
 
-  expect(firstElements).not.toEqual([1, 1, 1]);
+  expect([randomList1, randomList2, randomList3]).not.toEqual([
+    [1, 2, 3],
+    [1, 2, 3],
+    [1, 2, 3]
+  ]);
 });
 
 test('engine can randomize nested actions', async () => {
@@ -186,7 +185,7 @@ test('engine can randomize all actions when plan mode is set to random', async (
 });
 
 test('engine throws when given invalid plans, actions, or actors', async () => {
-  const params = [
+  const invalidParams = [
     {},
     {
       plans: ['selfTestA'],
@@ -198,7 +197,7 @@ test('engine throws when given invalid plans, actions, or actors', async () => {
     { plans: ['fakePlan'] }
   ];
 
-  for (const invalidParams in params) {
+  for (const params in invalidParams) {
     const errorMessage = await testRunError(params[invalidParams]);
     expect(typeof errorMessage).toEqual('string');
   }
