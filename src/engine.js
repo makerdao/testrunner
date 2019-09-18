@@ -78,7 +78,12 @@ export default class Engine {
           ...result.actors,
           ...this._importActors(importedPlan.actors)
         };
-        importedPlan.actions.forEach(action => {
+
+        const actions =
+          importedPlan.mode === 'random'
+            ? this._randomize(importedPlan.actions)
+            : importedPlan.actions;
+        actions.forEach(action => {
           result.actions.push(action);
         });
 
