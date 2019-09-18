@@ -100,7 +100,7 @@ test('randomize', () => {
 
 test('engine randomizes nested actions', async () => {
   const engine = new Engine();
-  const report = await engine.run({
+  const actorsAndActions = {
     actors: {
       user1: 'selfTestUser',
       user2: 'selfTestUser',
@@ -113,20 +113,27 @@ test('engine randomizes nested actions', async () => {
       [['user3', 'checkUser'], ['user4', 'checkUser'], ['user5', 'checkUser']],
       ['user2', 'checkUser']
     ]
-  });
+  };
+  const report1 = await engine.run({ ...actorsAndActions });
+  let report2 = await engine.run({ ...actorsAndActions });
 
-  expect(report.success).toEqual(true);
-  expect(report.results.length).toEqual(5);
+  if (report1 === report2) {
+    report2 = await engine.run({ ...actorsAndActions });
+  }
+
+  expect(report1).not.toEqual(report2);
 });
 
 test('engine randomizes nested actions from imported plans', async () => {
   const engine = new Engine();
-  const report = await engine.run({
-    plans: ['selfTestC']
-  });
+  const report1 = await engine.run({ plans: ['selfTestC'] });
+  let report2 = await engine.run({ plans: ['selfTestC'] });
 
-  expect(report.success).toEqual(true);
-  expect(report.results.length).toEqual(5);
+  if (report1 === report2) {
+    report2 = await engine.run({ plans: ['selfTestC'] });
+  }
+
+  expect(report1).not.toEqual(report2);
 });
 
 test('engine randomizes all actions when plan mode is set to random', async () => {

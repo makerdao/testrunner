@@ -15,6 +15,7 @@ export default class Engine {
     );
 
     const plan = plans ? this._importPlans(plans) : null;
+    console.log(actions);
     actions = actions
       ? this._randomActionCheck(actions)
       : this._randomActionCheck(plan.actions);
@@ -110,15 +111,17 @@ export default class Engine {
   }
 
   _randomActionCheck(actions) {
-    actions.forEach((action, index) => {
+    const orderedActions = [...actions];
+    orderedActions.forEach((action, index) => {
       if (typeof action[0] === 'object') {
         const randomActions = this._randomize(action);
-        actions.splice(index, 1);
+        orderedActions.splice(index, 1);
         randomActions.forEach((randomAction, randomIndex) => {
-          actions.splice(index + randomIndex, 0, randomAction);
+          orderedActions.splice(index + randomIndex, 0, randomAction);
         });
       }
     });
-    return actions;
+
+    return orderedActions;
   }
 }
