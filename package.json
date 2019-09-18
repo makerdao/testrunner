@@ -4,9 +4,12 @@
   "description": "Automated Test Runner for JS Products",
   "main": "index.js",
   "dependencies": {
+    "@babel/runtime": "^7.6.0",
+    "@makerdao/testchain-client": "^0.2.6-rc.1",
     "jest": "^24.9.0"
   },
   "devDependencies": {
+    "@babel/plugin-transform-runtime": "^7.6.0",
     "@babel/preset-env": "^7.5.5",
     "babel-core": "^6.26.3",
     "babel-jest": "^24.9.0"
