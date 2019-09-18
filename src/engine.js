@@ -15,7 +15,7 @@ export default class Engine {
     );
 
     const plan = plans ? this._importPlans(plans) : null;
-    const orderedActions = actions
+    actions = actions
       ? this._randomActionCheck(actions)
       : this._randomActionCheck(plan.actions);
     actors = actors ? this._importActors(actors) : plan.actors;
@@ -26,7 +26,7 @@ export default class Engine {
       completed: []
     };
 
-    for (const action of orderedActions) {
+    for (const action of actions) {
       if (report.success) {
         const importedAction = ACTIONS[action[1]];
         assert(importedAction, `Could not import action: ${action[1]}`);
