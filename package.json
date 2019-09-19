@@ -21,7 +21,7 @@
     "prettier": "^1.18.2"
   },
   "scripts": {
-    "test": "jest",
+    "test": "jest --forceExit",
     "babel-confirm": "node ./utilities/setup/babelConfirm.js",
     "precommit": "lint-staged"
   },
