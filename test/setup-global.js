@@ -6,6 +6,9 @@ module.exports = async function() {
     'http://localhost:4000'
     // 'https://testchain-backendgatway.makerfoundation.com:4001'
   );
+
+  global.client = client;
+
   await client.init();
 
   console.log('client connected');
