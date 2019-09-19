@@ -6,19 +6,27 @@
   "dependencies": {
     "@babel/runtime": "^7.6.0",
     "@makerdao/testchain-client": "^0.2.6-rc.1",
-    "jest": "^24.9.0"
+    "jest": "^24.9.0",
+    "ws": "^7.1.2"
   },
   "devDependencies": {
     "@babel/plugin-transform-runtime": "^7.6.0",
     "@babel/preset-env": "^7.5.5",
     "babel-core": "^6.26.3",
-    "babel-jest": "^24.9.0"
+    "babel-jest": "^24.9.0",
+    "babel-eslint": "^10.0.3",
+    "eslint": "^6.3.0",
+    "husky": "0.14.3",
+    "lint-staged": "^9.2.5",
+    "prettier": "^1.18.2"
   },
   "scripts": {
     "test": "jest",
-    "babel-confirm": "node ./utilities/setup/babelConfirm.js"
+    "babel-confirm": "node ./utilities/setup/babelConfirm.js",
+    "precommit": "lint-staged"
   },
   "jest": {
+    "globalSetup": "<rootDir>/test/setup-global.js",
     "transform": {
       "^.+\\.jsx?$": "babel-jest"
     }
@@ -26,6 +34,18 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/makerdao/testrunner.git"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "./**/*.js": [
+      "prettier --single-quote --write",
+      "eslint",
+      "git add"
+    ]
   },
   "author": "",
   "license": "ISC",
