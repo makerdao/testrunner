@@ -6,7 +6,7 @@ import assert from 'assert';
 
 export default class Engine {
   constructor(client) {
-    this._client = client ? client : this._importClient();
+    this._client = client ? client : createClient();
   }
 
   async run({ plans, actions, actors } = {}) {
@@ -84,9 +84,5 @@ export default class Engine {
       },
       { actors: {}, actions: [] }
     );
-  }
-
-  _importClient() {
-    return createClient();
   }
 }
