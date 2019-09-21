@@ -20,6 +20,6 @@ export default function createClient() {
     accounts: 3
   });
   cachedInstance = client;
-
+  console.log('supp');
   return client;
 }
