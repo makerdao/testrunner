@@ -10,7 +10,8 @@ export default function createClient() {
   if (cachedInstance) return cachedInstance;
 
   const client = new Client(
-    'https://testchain-backendgatway.makerfoundation.com:4001'
+    'http://localhost:4000'
+    // 'https://testchain-backendgatway.makerfoundation.com:4001'
   );
   client.init();
   client.create({
@@ -20,6 +21,6 @@ export default function createClient() {
     accounts: 3
   });
   cachedInstance = client;
-  console.log('supp');
+
   return client;
 }
