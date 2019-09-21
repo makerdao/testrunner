@@ -1,11 +1,15 @@
 import ACTORS from './actors';
 import ACTIONS from './actions';
 import PLANS from './plans';
+import createClient from './testchain';
 import assert from 'assert';
 
 export default class Engine {
-  constructor() {
-    // Set up staxx here
+  constructor(client) {
+    // Probably not ideal to set this to a promise, but
+    // since `run` is the only externally facing function
+    // it might not be so bad in this case
+    this._client = client ? client : this._importClient();
   }
 
   async run({ plans, actions, actors } = {}) {
@@ -13,6 +17,8 @@ export default class Engine {
       (plans || (actors && actions)) && Object.keys(arguments[0]).length < 3,
       'Must provide plans or actors/actions (but not both)'
     );
+
+    console.log(await this._client.api.listAllChains());
 
     const plan = plans ? this._importPlans(plans) : null;
     actions = actions ? actions : plan.actions;
@@ -83,5 +89,9 @@ export default class Engine {
       },
       { actors: {}, actions: [] }
     );
+  }
+
+  _importClient() {
+    return createClient();
   }
 }
