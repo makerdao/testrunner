@@ -1,6 +1,9 @@
 // const { Client, Event } = require('@makerdao/testchain-client');
 // global.WebSocket = require('ws');
 
+// Do we want jest to set up a client automatically?
+// If so, it should be here. If not, we don't need this
+
 module.exports = async function() {
   // const client = new Client(
   //   'http://localhost:4000'
