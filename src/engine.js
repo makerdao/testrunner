@@ -1,6 +1,7 @@
 import ACTORS from './actors';
 import ACTIONS from './actions';
 import PLANS from './plans';
+import client from './testchain';
 import assert from 'assert';
 
 export default class Engine {
@@ -13,6 +14,8 @@ export default class Engine {
       (plans || (actors && actions)) && Object.keys(arguments[0]).length < 3,
       'Must provide plans or actors/actions (but not both)'
     );
+
+    const chain = await client();
 
     const plan = plans ? this._importPlans(plans) : null;
     actions = actions ? actions : plan.actions;

@@ -7,31 +7,31 @@ module.exports = async function() {
     // 'https://testchain-backendgatway.makerfoundation.com:4001'
   );
 
-  global.client = client;
+  // global.client = client;
 
-  await client.init();
+  // await client.init();
 
-  console.log('client connected');
+  // console.log('client connected');
 
-  const { OK } = Event;
+  // const { OK } = Event;
 
-  const config = {
-    accounts: 4,
-    block_mine_time: 0,
-    clean_on_stop: false,
-    network_id: 1337,
-    type: 'geth',
-    step_id: 4
-  };
+  // const config = {
+  //   accounts: 4,
+  //   block_mine_time: 0,
+  //   clean_on_stop: false,
+  //   network_id: 1337,
+  //   type: 'geth',
+  //   step_id: 4
+  // };
 
-  client.create(config);
+  // client.create(config);
 
-  const {
-    payload: {
-      response: { id }
-    }
-  } = await client.once('api', OK);
-  console.log(id, 'id');
-  const { details: chain } = await client.api.getChain(id);
-  console.log(chain, 'chain');
+  // const {
+  //   payload: {
+  //     response: { id }
+  //   }
+  // } = await client.once('api', OK);
+  // console.log(id, 'id');
+  // const { details: chain } = await client.api.getChain(id);
+  // console.log(chain, 'chain');
 };
