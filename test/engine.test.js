@@ -83,3 +83,8 @@ test('fail after', async () => {
     completed: [['user1', 'checkUser']]
   });
 });
+
+test('engine sets up a testchain client by default', () => {
+  const engine = new Engine();
+  expect(engine._client).toBeDefined();
+});
