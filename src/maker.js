@@ -11,6 +11,8 @@ export default async function createMaker() {
 
   // This appears to be the only existing chain on prod with contracts deployed:
   // const id = '13509017273128723302';
+
+  const chains = await client.api.listAllChains();
   const { OK } = Event;
   const {
     payload: {
@@ -18,9 +20,14 @@ export default async function createMaker() {
     }
   } = await client.once('api', OK);
   console.log(id, 'id-teardown');
+  const chainData = chains.data[0];
+  console.log(chains.data);
+  for (const chain in chains.data) {
+    console.log(chains.data[chain]);
+    // client.stop(chains.data[chain].id)
+  }
 
-  const { details: chainData } = await client.api.getChain(id);
-  console.log(chainData);
+  // const { details: chainData } = await client.api.getChain(id);
   const accounts = getAccounts(chainData);
 
   const config = {
