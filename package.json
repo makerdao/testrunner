@@ -7,9 +7,11 @@
     "@babel/plugin-transform-runtime": "^7.6.0",
     "@babel/preset-env": "^7.6.0",
     "@babel/runtime": "^7.6.0",
+    "@makerdao/testchain-client": "^0.2.6-rc.1",
     "babel-core": "^6.26.3",
     "babel-jest": "^24.9.0",
-    "jest": "^24.9.0"
+    "jest": "^24.9.0",
+    "ws": "^7.1.2"
   },
   "devDependencies": {
     "babel-eslint": "^10.0.3",
@@ -24,6 +26,8 @@
     "precommit": "lint-staged"
   },
   "jest": {
+    "globalSetup": "<rootDir>/test/setup-global.js",
+    "globalTeardown": "<rootDir>/test/teardown-global.js",
     "transform": {
       "^.+\\.jsx?$": "babel-jest"
     }

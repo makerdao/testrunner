@@ -1,11 +1,12 @@
 import ACTORS from './actors';
 import ACTIONS from './actions';
 import PLANS from './plans';
+import createClient from './testchain';
 import assert from 'assert';
 
 export default class Engine {
-  constructor() {
-    // Set up staxx here
+  constructor(client) {
+    this._client = client ? client : createClient();
   }
 
   async run({ plans, actions, actors } = {}) {
