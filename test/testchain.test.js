@@ -1,5 +1,9 @@
 import createClient from '../src/testchain';
-import createMaker from '../src/maker'
+import createMaker from '../src/maker';
+
+beforeAll(() => {
+  jest.setTimeout(8000);
+});
 
 test('createClient returns a connected testchain client', async () => {
   const client = createClient();
@@ -8,7 +12,14 @@ test('createClient returns a connected testchain client', async () => {
 });
 
 test('createMaker returns a connected maker instance', async () => {
-  jest.setTimeout(15000)
   const maker = await createMaker();
-  console.log(maker)
-})
+  expect(maker).toBeDefined();
+
+  // random data to verify the service is working
+  const cdpTypeService = maker.service('mcd:cdpType');
+  const [eth, , , zrx] = cdpTypeService.cdpTypes;
+  const ethData = await eth._prefetchPromise;
+  const zrxData = await zrx._prefetchPromise;
+  console.log('ETH', ethData);
+  console.log('ZRX', zrxData);
+});

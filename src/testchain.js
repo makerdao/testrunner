@@ -1,6 +1,6 @@
 import { Client } from '@makerdao/testchain-client';
-import Maker from '@makerdao/dai'
-import configPlugin from '@makerdao/dai-plugin-config'
+// import Maker from '@makerdao/dai'
+// import configPlugin from '@makerdao/dai-plugin-config'
 
 let cachedInstance;
 // We should make caching optional
@@ -16,6 +16,12 @@ export default function createClient() {
     'https://testchain-backendgatway.makerfoundation.com:4001'
   );
   client.init();
+
+  /*
+  client.create doesn't appear to be working here, so no testchain is created.
+  hard to debug on prod, but if you run the testchain_backend locally
+  it should log the error
+  */
   client.create({
     clean_on_stop: false,
     chainType: 'ganache',
