@@ -1,4 +1,6 @@
 import { Client } from '@makerdao/testchain-client';
+import Maker from '@makerdao/dai'
+import configPlugin from '@makerdao/dai-plugin-config'
 
 let cachedInstance;
 // We should make caching optional
