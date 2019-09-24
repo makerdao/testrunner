@@ -1,7 +1,7 @@
-import Maker from '@makerdao/dai'
-import daiPlugin from '@makerdao/dai-plugin-mcd'
-import configPlugin from '@makerdao/dai-plugin-config'
-import createClient from './testchain'
+import Maker from '@makerdao/dai';
+import daiPlugin from '@makerdao/dai-plugin-mcd';
+import configPlugin from '@makerdao/dai-plugin-config';
+import createClient from './testchain';
 
 const fetchAccounts = async () => {
   const client = global.client;
@@ -32,13 +32,14 @@ const fetchAccounts = async () => {
 };
 
 export default async function createMaker() {
-  const client = createClient()
+  const client = createClient();
 
   const networks = await client.api.listAllChains();
-  const id = networks.data[0].id
+  const id = networks.data[0].id;
 
   const { details: chainData } = await client.api.getChain(id);
-  const deployedAccounts = chainData.chain_details.accounts
+  console.log(chainData);
+  const deployedAccounts = chainData.chain_details.accounts;
 
   const coinbaseAccount = deployedAccounts.find(
     account => account.address === chainData.chain_details.coinbase
@@ -60,16 +61,20 @@ export default async function createMaker() {
   const config = {
     plugins: [
       [daiPlugin],
-      [
-        [configPlugin, { testchainId: id, backendEnv: 'dev', }]
-      ]
+      [[configPlugin, { testchainId: id, backendEnv: 'dev' }]]
     ],
     log: false,
-    url: client.api._url,
+    url: chainData.chain_details.rpc_url,
     accounts: accounts
-  }
-  const maker = await Maker.create('http', config)
-  await maker.authenticate()
-  return maker
+  };
 
+  let maker;
+
+  try {
+    maker = await Maker.create('http', config);
+    await maker.authenticate();
+  } catch (err) {
+    console.error(err);
+  }
+  return maker;
 }
