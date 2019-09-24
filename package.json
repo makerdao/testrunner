@@ -11,6 +11,7 @@
     "babel-core": "^6.26.3",
     "babel-jest": "^24.9.0",
     "jest": "^24.9.0",
+    "lodash": "^4.17.15",
     "ws": "^7.1.2"
   },
   "devDependencies": {
