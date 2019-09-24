@@ -6,22 +6,21 @@ import assert from 'assert';
 
 export default class Engine {
   constructor(client) {
-    // Probably not ideal to set this to a promise, but
-    // since `run` is the only externally facing function
-    // it might not be so bad in this case
-    this._client = client ? client : this._importClient();
+    this._client = client ? client : createClient();
   }
 
   async run({ plans, actions, actors } = {}) {
     assert(
       (plans || (actors && actions)) && Object.keys(arguments[0]).length < 3,
-      'Must provide plans or actors/actions (but not both)'
+      'Must provide { plans } OR { actors, actions }, but not both'
     );
 
     console.log(await this._client.api.listAllChains());
 
     const plan = plans ? this._importPlans(plans) : null;
-    actions = actions ? actions : plan.actions;
+    actions = actions
+      ? this._randomActionCheck(actions)
+      : this._randomActionCheck(plan.actions);
     actors = actors ? this._importActors(actors) : plan.actors;
 
     let report = {
@@ -65,8 +64,9 @@ export default class Engine {
         `Could not import actor: { ${name}: ${actors[name]} }`
       );
       result[name] = ACTORS[actors[name]](name);
-      if (!result[name].privateKey)
+      if (!result[name].privateKey) {
         console.warn(`{ ${name}: ${actors[name]} } has no private key!`);
+      }
       return result;
     }, {});
   }
@@ -81,7 +81,12 @@ export default class Engine {
           ...result.actors,
           ...this._importActors(importedPlan.actors)
         };
-        importedPlan.actions.forEach(action => {
+
+        const actions =
+          importedPlan.mode === 'random'
+            ? this._randomize(importedPlan.actions)
+            : importedPlan.actions;
+        actions.forEach(action => {
           result.actions.push(action);
         });
 
@@ -91,7 +96,30 @@ export default class Engine {
     );
   }
 
-  _importClient() {
-    return createClient();
+  _randomize(actions) {
+    const randomizedActions = [...actions];
+    let currentIndex = randomizedActions.length,
+      temporaryValue,
+      randomIndex;
+
+    while (currentIndex !== 0) {
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex -= 1;
+      temporaryValue = randomizedActions[currentIndex];
+      randomizedActions[currentIndex] = randomizedActions[randomIndex];
+      randomizedActions[randomIndex] = temporaryValue;
+    }
+
+    return randomizedActions;
+  }
+
+  _randomActionCheck(actions) {
+    const orderedActions = [...actions];
+    orderedActions.forEach((action, index) => {
+      if (typeof action[0] === 'object') {
+        orderedActions.splice(index, 1, ...this._randomize(action));
+      }
+    });
+    return orderedActions;
   }
 }
