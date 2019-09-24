@@ -1,5 +1,5 @@
 import createClient from '../src/testchain';
-import createMaker from '../src/maker'
+import createMaker from '../src/maker';
 
 test('createClient returns a connected testchain client', async () => {
   const client = createClient();
@@ -8,7 +8,6 @@ test('createClient returns a connected testchain client', async () => {
 });
 
 test('createMaker returns a connected maker instance', async () => {
-  jest.setTimeout(15000)
   const maker = await createMaker();
-  console.log(maker)
-})
+  expect(maker).toBeDefined();
+});
