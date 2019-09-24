@@ -2,6 +2,7 @@ import Maker from '@makerdao/dai';
 import daiPlugin from '@makerdao/dai-plugin-mcd';
 import configPlugin from '@makerdao/dai-plugin-config';
 import createClient from './testchain';
+import { Event } from '@makerdao/testchain-client';
 
 export default async function createMaker() {
   const client = createClient();
@@ -9,16 +10,24 @@ export default async function createMaker() {
   // const id = networks.data[0].id;
 
   // This appears to be the only existing chain on prod with contracts deployed:
-  const id = '13509017273128723302';
+  // const id = '13509017273128723302';
+  const { OK } = Event;
+  const {
+    payload: {
+      response: { id }
+    }
+  } = await client.once('api', OK);
+  console.log(id, 'id-teardown');
 
   const { details: chainData } = await client.api.getChain(id);
+  console.log(chainData);
   const accounts = getAccounts(chainData);
 
   const config = {
     plugins: [
       [daiPlugin, { prefetch: true }],
       // since the Client is created with prod URL, backendEnv should be prod here:
-      [configPlugin, { testchainId: id, backendEnv: 'prod' }]
+      [configPlugin, { testchainId: id, backendEnv: 'http://localhost:4000' }]
     ],
     log: false,
     url: chainData.chain_details.rpc_url,
