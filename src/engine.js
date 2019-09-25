@@ -3,11 +3,10 @@ import ACTIONS from './actions';
 import PLANS from './plans';
 import createClient from './testchain';
 import assert from 'assert';
+import shuffle from 'lodash/shuffle';
 
 export default class Engine {
-  constructor(client) {
-    this._client = client ? client : createClient();
-  }
+  constructor() {}
 
   async run({ plans, actions, actors } = {}) {
     assert(
@@ -15,7 +14,13 @@ export default class Engine {
       'Must provide { plans } OR { actors, actions }, but not both'
     );
 
-    // console.log(await this._client.api.listAllChains());
+    // TODO set this based on whether the plans/actions require a testchain
+    const shouldUseTestchainClient = false;
+
+    if (shouldUseTestchainClient) {
+      this._client = createClient();
+      console.log(await this._client.api.listAllChains());
+    }
 
     const plan = plans ? this._importPlans(plans) : null;
     actions = actions
@@ -84,7 +89,7 @@ export default class Engine {
 
         const actions =
           importedPlan.mode === 'random'
-            ? this._randomize(importedPlan.actions)
+            ? shuffle(importedPlan.actions)
             : importedPlan.actions;
         actions.forEach(action => {
           result.actions.push(action);
@@ -96,28 +101,11 @@ export default class Engine {
     );
   }
 
-  _randomize(actions) {
-    const randomizedActions = [...actions];
-    let currentIndex = randomizedActions.length,
-      temporaryValue,
-      randomIndex;
-
-    while (currentIndex !== 0) {
-      randomIndex = Math.floor(Math.random() * currentIndex);
-      currentIndex -= 1;
-      temporaryValue = randomizedActions[currentIndex];
-      randomizedActions[currentIndex] = randomizedActions[randomIndex];
-      randomizedActions[randomIndex] = temporaryValue;
-    }
-
-    return randomizedActions;
-  }
-
   _randomActionCheck(actions) {
     const orderedActions = [...actions];
     orderedActions.forEach((action, index) => {
       if (typeof action[0] === 'object') {
-        orderedActions.splice(index, 1, ...this._randomize(action));
+        orderedActions.splice(index, 1, ...shuffle(action));
       }
     });
     return orderedActions;
