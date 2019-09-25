@@ -5,9 +5,7 @@ import createClient from './testchain';
 import assert from 'assert';
 
 export default class Engine {
-  constructor(client) {
-    this._client = client ? client : createClient();
-  }
+  constructor() {}
 
   async run({ plans, actions, actors } = {}) {
     assert(
@@ -15,7 +13,13 @@ export default class Engine {
       'Must provide { plans } OR { actors, actions }, but not both'
     );
 
-    console.log(await this._client.api.listAllChains());
+    // TODO set this based on whether the plans/actions require a testchain
+    const shouldUseTestchainClient = false;
+
+    if (shouldUseTestchainClient) {
+      this._client = createClient();
+      console.log(await this._client.api.listAllChains());
+    }
 
     const plan = plans ? this._importPlans(plans) : null;
     actions = actions

@@ -211,8 +211,3 @@ async function testRunError(params) {
     return err.message;
   }
 }
-
-test('engine sets up a testchain client by default', () => {
-  const engine = new Engine();
-  expect(engine._client).toBeDefined();
-});
