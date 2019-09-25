@@ -15,7 +15,7 @@ export default class Engine {
       'Must provide { plans } OR { actors, actions }, but not both'
     );
 
-    console.log(await this._client.api.listAllChains());
+    // console.log(await this._client.api.listAllChains());
 
     const plan = plans ? this._importPlans(plans) : null;
     actions = actions

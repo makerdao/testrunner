@@ -840,8 +840,10 @@
     babel-runtime "^6.26.0"
     ramda "^0.26.1"
 
-"@makerdao/dai-plugin-mcd@file:.yalc/@makerdao/dai-plugin-mcd":
-  version "0.2.13-3bbd3615"
+"@makerdao/dai-plugin-mcd@^0.2.14-rc.1":
+  version "0.2.14-rc.1"
+  resolved "https://registry.yarnpkg.com/@makerdao/dai-plugin-mcd/-/dai-plugin-mcd-0.2.14-rc.1.tgz#204d9afa241cca4127eb3b69af4302001bd3b0bf"
+  integrity sha512-uL6sScVwUtokqziJcvzl1W6fjXGUioP0i1YtGSTGz+/SW/gY+R8Rz9PqL5mG3kmDRoZdYriOAWEZvtCdUIeH1g==
   dependencies:
     "@makerdao/currency" "^0.9.5"
     "@makerdao/services-core" "^0.9.9"

@@ -6,7 +6,7 @@ beforeAll(() => {
 });
 
 test('createClient returns a connected testchain client', async () => {
-  const client = createClient();
+  const client = await createClient();
   const networks = await client.api.listAllChains();
   expect(networks.data[0].id).toBeDefined();
 });
