@@ -2,14 +2,14 @@ import { Client } from '@makerdao/testchain-client';
 // import Maker from '@makerdao/dai'
 // import configPlugin from '@makerdao/dai-plugin-config'
 
-// let cachedInstance;
+let cachedInstance;
 // We should make caching optional
 
 export default async function createClient() {
   // We should probably accept an object of
   // options here with the below as defaults
 
-  // if (cachedInstance) return cachedInstance;
+  if (cachedInstance) return cachedInstance;
 
   const client = await new Client(
     // 'http://localhost:4000',
@@ -29,7 +29,7 @@ export default async function createClient() {
     block_mine_time: 0,
     accounts: 3
   });
-  // cachedInstance = client;
+  cachedInstance = client;
 
   return client;
 }
