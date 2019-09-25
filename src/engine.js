@@ -6,15 +6,21 @@ import assert from 'assert';
 import shuffle from 'lodash/shuffle';
 
 export default class Engine {
-  constructor(client) {
-    this._client = client ? client : createClient();
-  }
+  constructor() {}
 
   async run({ plans, actions, actors } = {}) {
     assert(
       (plans || (actors && actions)) && Object.keys(arguments[0]).length < 3,
       'Must provide { plans } OR { actors, actions }, but not both'
     );
+
+    // TODO set this based on whether the plans/actions require a testchain
+    const shouldUseTestchainClient = false;
+
+    if (shouldUseTestchainClient) {
+      this._client = createClient();
+      console.log(await this._client.api.listAllChains());
+    }
 
     const plan = plans ? this._importPlans(plans) : null;
     actions = actions
