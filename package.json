@@ -23,7 +23,6 @@
   },
   "scripts": {
     "test": "jest",
-    "babel-confirm": "node ./utilities/setup/babelConfirm.js",
     "precommit": "lint-staged"
   },
   "jest": {
