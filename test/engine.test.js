@@ -107,19 +107,6 @@ test('when engine fails after, it stops immediately and updates report with erro
   expect(report.error.message).toEqual('failure in after');
 });
 
-test('randomize can shuffle arbitrary arrays', () => {
-  const engine = new Engine();
-  const randomList1 = engine._randomize([1, 2, 3]);
-  const randomList2 = engine._randomize([1, 2, 3]);
-  const randomList3 = engine._randomize([1, 2, 3]);
-
-  expect([randomList1, randomList2, randomList3]).not.toEqual([
-    [1, 2, 3],
-    [1, 2, 3],
-    [1, 2, 3]
-  ]);
-});
-
 test('engine can randomize nested actions', async () => {
   const engine = new Engine();
   const actorsAndActions = {
@@ -211,8 +198,3 @@ async function testRunError(params) {
     return err.message;
   }
 }
-
-test('engine sets up a testchain client by default', () => {
-  const engine = new Engine();
-  expect(engine._client).toBeDefined();
-});
