@@ -6,14 +6,20 @@ import assert from 'assert';
 import shuffle from 'lodash/shuffle';
 
 export default class Engine {
-  constructor() {}
-
-  async run({ plans, actions, actors } = {}) {
+  constructor(options = {}) {
+    const { plans, actions, actors, url } = options;
     assert(
       (plans || (actors && actions)) && Object.keys(arguments[0]).length < 3,
       'Must provide { plans } OR { actors, actions }, but not both'
     );
 
+    this._plans = plans;
+    this._actors = actors;
+    this._actions = actions;
+    this._url = url;
+  }
+
+  async run() {
     // TODO set this based on whether the plans/actions require a testchain
     const shouldUseTestchainClient = false;
 
@@ -22,17 +28,10 @@ export default class Engine {
       console.log(await this._client.api.listAllChains());
     }
 
-    const plan = plans ? this._importPlans(plans) : null;
-    actions = actions
-      ? this._randomActionCheck(actions)
-      : this._randomActionCheck(plan.actions);
-    actors = await this._importActors(actors || plan.actors);
-
-    let report = {
-      results: [],
-      success: true,
-      completed: []
-    };
+    const plan = this._plans ? this._importPlans(this._plans) : null;
+    const actions = this._randomActionCheck(this._actions || plan.actions);
+    const actors = await this._importActors(this._actors || plan.actors);
+    const report = { results: [], success: true, completed: [] };
 
     for (const action of actions) {
       if (report.success) {
@@ -57,7 +56,8 @@ export default class Engine {
 
   async _runAction(action, actor) {
     if (action.before) await action.before(actor);
-    const result = await action.operation(actor);
+    // TODO switch maker account to match actor
+    const result = await action.operation(actor, this._maker);
     if (action.after) await action.after(actor);
     return result;
   }
@@ -69,10 +69,7 @@ export default class Engine {
         ACTORS[actors[name]],
         `Could not import actor: { ${name}: ${actors[name]} }`
       );
-      result[name] = await ACTORS[actors[name]](name);
-      if (!result[name].privateKey) {
-        console.warn(`{ ${name}: ${actors[name]} } has no private key!`);
-      }
+      result[name] = await ACTORS[actors[name]](name, this._maker);
     }
     return result;
   }
