@@ -26,7 +26,7 @@ export default class Engine {
     actions = actions
       ? this._randomActionCheck(actions)
       : this._randomActionCheck(plan.actions);
-    actors = actors ? this._importActors(actors) : plan.actors;
+    actors = await this._importActors(actors || plan.actors);
 
     let report = {
       results: [],
@@ -62,18 +62,19 @@ export default class Engine {
     return result;
   }
 
-  _importActors(actors) {
-    return Object.keys(actors).reduce((result, name) => {
+  async _importActors(actors) {
+    const result = {};
+    for (let name of Object.keys(actors)) {
       assert(
         ACTORS[actors[name]],
         `Could not import actor: { ${name}: ${actors[name]} }`
       );
-      result[name] = ACTORS[actors[name]](name);
+      result[name] = await ACTORS[actors[name]](name);
       if (!result[name].privateKey) {
         console.warn(`{ ${name}: ${actors[name]} } has no private key!`);
       }
-      return result;
-    }, {});
+    }
+    return result;
   }
 
   _importPlans(plans) {
@@ -81,20 +82,13 @@ export default class Engine {
       (result, plan) => {
         const importedPlan = PLANS[plan];
         assert(importedPlan, `Could not import plan: ${plan}`);
-
-        result.actors = {
-          ...result.actors,
-          ...this._importActors(importedPlan.actors)
-        };
+        result.actors = { ...result.actors, ...importedPlan.actors };
 
         const actions =
           importedPlan.mode === 'random'
             ? shuffle(importedPlan.actions)
             : importedPlan.actions;
-        actions.forEach(action => {
-          result.actions.push(action);
-        });
-
+        result.actions = result.actions.concat(actions);
         return result;
       },
       { actors: {}, actions: [] }
