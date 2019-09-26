@@ -1,11 +1,9 @@
-import selfTestA from './selfTestA';
-import selfTestB from './selfTestB';
-import selfTestC from './selfTestC';
-import selfTestD from './selfTestD';
+import fs from 'fs';
 
-export default {
-  selfTestA,
-  selfTestB,
-  selfTestC,
-  selfTestD
-};
+export default fs.readdirSync(__dirname)
+  .filter(f => f !== 'index.js')
+  .map(f => f.replace('.js', ''))
+  .reduce((a, name) => {
+    a[name] = require(`./${name}`).default;
+    return a;
+  }, {});
