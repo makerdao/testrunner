@@ -4,6 +4,8 @@ import PLANS from './plans';
 import createClient from './testchain';
 import assert from 'assert';
 import shuffle from 'lodash/shuffle';
+import Maker from '@makerdao/dai';
+import McdPlugin from '@makerdao/dai-plugin-mcd';
 
 export default class Engine {
   constructor(options = {}) {
@@ -26,6 +28,13 @@ export default class Engine {
     if (shouldUseTestchainClient) {
       this._client = createClient();
       console.log(await this._client.api.listAllChains());
+    } else if (this._url) {
+      this._maker = await Maker.create('http', {
+        url: this._url,
+        plugins: [
+          [McdPlugin, { network: 'testnet' }]
+        ]
+      });
     }
 
     const plan = this._plans ? this._importPlans(this._plans) : null;

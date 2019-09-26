@@ -8,6 +8,8 @@
     "@babel/preset-env": "^7.6.0",
     "@babel/register": "^7.6.2",
     "@babel/runtime": "^7.6.0",
+    "@makerdao/dai": "^0.18.5",
+    "@makerdao/dai-plugin-mcd": "^0.2.14-rc.1",
     "@makerdao/testchain-client": "^0.2.6-rc.1",
     "babel-jest": "^24.9.0",
     "commander": "^3.0.1",
