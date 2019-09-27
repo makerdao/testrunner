@@ -9,16 +9,12 @@ import McdPlugin from '@makerdao/dai-plugin-mcd';
 
 export default class Engine {
   constructor(options = {}) {
-    const { plans, actions, actors, url } = options;
+    const { plans, actions, actors } = options;
     assert(
-      (plans || (actors && actions)) && Object.keys(arguments[0]).length < 3,
+      plans || (actors && actions),
       'Must provide { plans } OR { actors, actions }, but not both'
     );
-
-    this._plans = plans;
-    this._actors = actors;
-    this._actions = actions;
-    this._url = url;
+    this._options = options;
   }
 
   async run() {
@@ -28,18 +24,22 @@ export default class Engine {
     if (shouldUseTestchainClient) {
       this._client = createClient();
       console.log(await this._client.api.listAllChains());
-    } else if (this._url) {
+    } else if (this._options.url) {
       this._maker = await Maker.create('http', {
-        url: this._url,
-        plugins: [
-          [McdPlugin, { network: 'testnet' }]
-        ]
+        url: this._options.url,
+        plugins: [[McdPlugin, { network: 'testnet' }]]
       });
     }
 
-    const plan = this._plans ? this._importPlans(this._plans) : null;
-    const actions = this._randomActionCheck(this._actions || plan.actions);
-    const actors = await this._importActors(this._actors || plan.actors);
+    const plan = this._options.plans
+      ? this._importPlans(this._options.plans)
+      : null;
+    const actions = this._randomActionCheck(
+      this._options.actions || plan.actions
+    );
+    const actors = await this._importActors(
+      this._options.actors || plan.actors
+    );
     const report = { results: [], success: true, completed: [] };
 
     for (const action of actions) {
@@ -64,11 +64,22 @@ export default class Engine {
   }
 
   async _runAction(action, actor) {
-    if (action.before) await action.before(actor);
+    const { before, operation, after } = action;
+
     // TODO switch maker account to match actor
-    const result = await action.operation(actor, this._maker);
-    if (action.after) await action.after(actor);
+
+    if (before) await this._runStep(before.bind(action), actor);
+    const result = await this._runStep(operation.bind(action), actor);
+    if (after) await this._runStep(after.bind(action), actor);
     return result;
+  }
+
+  _runStep(step, actor) {
+    assert(
+      step.length < 2 || this._maker,
+      'Action requires Maker instance but none exists'
+    );
+    return step(actor);
   }
 
   async _importActors(actors) {
@@ -78,7 +89,11 @@ export default class Engine {
         ACTORS[actors[name]],
         `Could not import actor: { ${name}: ${actors[name]} }`
       );
-      result[name] = await ACTORS[actors[name]](name, this._maker);
+      result[name] = await ACTORS[actors[name]](
+        name,
+        this._maker,
+        this._options
+      );
     }
     return result;
   }
