@@ -1,13 +1,15 @@
 version: 2
 jobs:
   build-testrunner:
-    docker:
-      - image: circleci/node:lts
+    macos:
+      xcode: "9.0"
     steps:
       - checkout
       - run: npm i yarn
       - run: yarn
   install-docker-compose:
+    macos:
+      xcode: "9.0"
     steps:
       - run:
         name: Install Docker Compose
@@ -17,6 +19,8 @@ jobs:
           sudo mv ~/docker-compose /usr/local/bin/docker-compose
       - setup_remote_docker
   build-staxx:
+    macos:
+      xcode: "9.0"
     steps:
       - run:
         name: Build Staxx
@@ -26,5 +30,7 @@ jobs:
           make dc-up
           make run-dev
   testrunner-self-tests:
+    macos:
+      xcode: "9.0"
     steps:
       - run yarn test
