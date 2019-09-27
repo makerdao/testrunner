@@ -1,10 +1,30 @@
- version: 2
- jobs:
-   build:
-     docker:
-       - image: circleci/node:lts
-     steps:
-       - checkout
-       - run: npm i yarn
-       - run: yarn
-       - run: yarn test
+version: 2
+jobs:
+  build-testrunner:
+    docker:
+      - image: circleci/node:lts
+    steps:
+      - checkout
+      - run: npm i yarn
+      - run: yarn
+  install-docker-compose:
+    steps:
+      - run:
+        name: Install Docker Compose
+        command: |
+          curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+          chmod +x ~/docker-compose
+          sudo mv ~/docker-compose /usr/local/bin/docker-compose
+      - setup_remote_docker
+  build-staxx:
+    steps:
+      - run:
+        name: Build Staxx
+        command: |
+          git clone https://github.com/makerdao/staxx.git
+          cd staxx
+          make dc-up
+          make run-dev
+  testrunner-self-tests:
+    steps:
+      - run yarn test
