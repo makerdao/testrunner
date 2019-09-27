@@ -11,9 +11,7 @@ jobs:
     docker:
       - image: circleci/node:lts
     steps:
-      - run:
-        name: Install Docker Compose
-        command: |
+      - run: |
           curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
           chmod +x ~/docker-compose
           sudo mv ~/docker-compose /usr/local/bin/docker-compose
@@ -22,9 +20,7 @@ jobs:
     docker:
       - image: circleci/node:lts
     steps:
-      - run:
-        name: Build Staxx/Run Tests
-        command: |
+      - run: |
           git clone https://github.com/makerdao/staxx.git
           cd staxx
           make dc-up
@@ -36,6 +32,8 @@ workflows:
   build_and_test:
     jobs:
       - build
+      - install-docker-compose
       - test:
           requires:
             - build
+            - install-docker-compose
