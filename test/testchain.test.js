@@ -1,17 +1,28 @@
-import createClient from '../src/testchain';
+import { createRemoteClient, createLocalClient } from '../src/testchain';
 import createMaker from '../src/maker';
 
 beforeAll(() => {
   jest.setTimeout(8000);
 });
 
-test('createClient returns a connected testchain client', async () => {
-  const client = await createClient();
+test('createRemoteClient returns a connected remote testchain client', async () => {
+  const client = await createRemoteClient();
   const networks = await client.api.listAllChains();
   expect(networks.data[0].id).toBeDefined();
 });
 
-test('createMaker returns a connected maker instance', async () => {
+test('createLocalClient connects to Staxx in CircleCI', async () => {
+  const client = await createLocalClient();
+  let error;
+  try {
+    await client.api.listAllChains();
+  } catch (err) {
+    error = err;
+  }
+  expect(error).not.toBeDefined();
+});
+
+xtest('createMaker returns a connected maker instance', async () => {
   const maker = await createMaker();
   expect(maker).toBeDefined();
 

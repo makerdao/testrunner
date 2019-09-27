@@ -1,11 +1,11 @@
 import Maker from '@makerdao/dai';
 import daiPlugin from '@makerdao/dai-plugin-mcd';
 import configPlugin from '@makerdao/dai-plugin-config';
-import createClient from './testchain';
+import { createRemoteClient } from './testchain';
 // import { Event } from '@makerdao/testchain-client';
 
 export default async function createMaker() {
-  const client = await createClient();
+  const client = await createRemoteClient();
   // const networks = await client.api.listAllChains();
   // const id = networks.data[0].id;
 
