@@ -87,7 +87,7 @@ export default class Engine {
       step.length < 2 || this._maker,
       'Action requires Maker instance but none exists'
     );
-    return step(actor);
+    return step(actor, this._maker);
   }
 
   async _importActors(actors) {
