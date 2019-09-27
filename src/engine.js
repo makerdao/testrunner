@@ -31,16 +31,24 @@ export default class Engine {
       });
     }
 
+    const report = { results: [], success: true, completed: [] };
+    let actors;
+
     const plan = this._options.plans
       ? this._importPlans(this._options.plans)
       : null;
     const actions = this._randomActionCheck(
       this._options.actions || plan.actions
     );
-    const actors = await this._importActors(
-      this._options.actors || plan.actors
-    );
-    const report = { results: [], success: true, completed: [] };
+    
+    try {
+      actors = await this._importActors(this._options.actors || plan.actors);
+    } catch (error) {
+      report.success = false;
+      report.error = error;
+      report.errorIndex = -1;
+      return report;
+    }
 
     for (const action of actions) {
       if (report.success) {
