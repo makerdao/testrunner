@@ -18,19 +18,24 @@ jobs:
           chmod +x ~/docker-compose
           sudo mv ~/docker-compose /usr/local/bin/docker-compose
       - setup_remote_docker
-  build-staxx:
+  test:
     docker:
       - image: circleci/node:lts
     steps:
       - run:
-        name: Build Staxx
+        name: Build Staxx/Run Tests
         command: |
           git clone https://github.com/makerdao/staxx.git
           cd staxx
           make dc-up
           make run-dev
-  testrunner-self-tests:
-    docker:
-      - image: circleci/node:lts
-    steps:
-      - run: yarn test
+          cd ..
+          yarn test
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
