@@ -11,4 +11,6 @@ export default async function(options) {
   const engine = new Engine(options);
   const report = await engine.run();
   console.log(report);
+  await engine.stop();
+  process.exit(report.success ? 0 : 1);
 }

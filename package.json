@@ -13,6 +13,7 @@
     "@makerdao/testchain-client": "^0.2.6-rc.1",
     "babel-jest": "^24.9.0",
     "commander": "^3.0.1",
+    "ethereumjs-wallet": "^0.6.3",
     "jest": "^24.9.0",
     "lodash": "^4.17.15",
     "ws": "^7.1.2"

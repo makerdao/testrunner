@@ -27,7 +27,8 @@ export default class Engine {
     } else if (this._options.url) {
       this._maker = await Maker.create('http', {
         url: this._options.url,
-        plugins: [[McdPlugin, { network: 'testnet' }]]
+        plugins: [[McdPlugin, { network: 'testnet' }]],
+        // autoAuthenticate: false
       });
     }
 
@@ -40,7 +41,7 @@ export default class Engine {
     const actions = this._randomActionCheck(
       this._options.actions || plan.actions
     );
-    
+
     try {
       actors = await this._importActors(this._options.actors || plan.actors);
     } catch (error) {
@@ -71,10 +72,15 @@ export default class Engine {
     return report;
   }
 
+  async stop() {
+    // TODO
+  }
+
   async _runAction(action, actor) {
     const { before, operation, after } = action;
 
     // TODO switch maker account to match actor
+    // use privateKeyAccountFactory
 
     if (before) await this._runStep(before.bind(action), actor);
     const result = await this._runStep(operation.bind(action), actor);

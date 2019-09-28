@@ -1,7 +1,45 @@
-export default async function(name, maker) {
-  // this is a bare-bones implementation; it won't work correctly with a maker
-  // instance that's been set up with multiple accounts
-  return {
-    address: maker.currentAccount()
-  };
+import assert from 'assert';
+import fs from 'fs';
+import path from 'path';
+import { fromV3 } from 'ethereumjs-wallet';
+
+export default async function(name, maker, options) {
+  const address = options.address || process.env.ETH_FROM;
+  assert(address, '--address or ETH_FROM must be set to use defaultAccount');
+
+  let privateKey;
+  if (!process.env.ETH_RPC_ACCOUNTS && !options.rpcAccounts) {
+    const keystore = options.keystore || process.env.ETH_KEYSTORE;
+    const password = options.password || process.env.ETH_PASSWORD || '';
+    privateKey = findKeyFromStore(address, keystore, password);
+  }
+
+  return { address, privateKey };
+}
+
+function findKeyFromStore(address, keystore, password) {
+  assert(keystore, '--keystore or ETH_KEYSTORE must be set');
+
+  let key;
+  for (const filename of fs.readdirSync(keystore)) {
+    const file = fs.readFileSync(path.join(keystore, filename)).toString();
+
+    try {
+      const data = JSON.parse(file);
+      if (data.address !== address) continue;
+    } catch (err) {
+      continue;
+    }
+
+    const wallet = fromV3(file, password);
+    key = wallet._privKey.toString('hex');
+    break;
+  }
+
+  assert(
+    key,
+    `Couldn't find key matching ${address.substring(0, 8)}... in ${keystore}`
+  );
+
+  return key;
 }
