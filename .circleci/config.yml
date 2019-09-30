@@ -5,8 +5,6 @@
        - image: circleci/node:lts
      steps:
        - checkout
-       - run: curl https://dapp.tools/install | sh
-       - run: . ~/.nix-profile/etc/profile.d/nix.sh
        - run: npm i yarn
        - run: yarn
        - run: yarn test
