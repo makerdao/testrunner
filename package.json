@@ -19,6 +19,7 @@
     "ws": "^7.1.2"
   },
   "devDependencies": {
+    "@makerdao/testchain": "^0.2.14",
     "babel-eslint": "^10.0.3",
     "eslint": "^6.3.0",
     "husky": "0.14.3",
@@ -26,7 +27,8 @@
     "prettier": "^1.18.2"
   },
   "scripts": {
-    "test": "jest",
+    "testchain": "./node_modules/@makerdao/testchain/scripts/launch -s default --fast",
+    "test": "yarn testchain --ci jest",
     "precommit": "lint-staged",
     "cli": "node ./src/cli"
   },

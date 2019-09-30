@@ -6,6 +6,8 @@ import assert from 'assert';
 import shuffle from 'lodash/shuffle';
 import Maker from '@makerdao/dai';
 import McdPlugin from '@makerdao/dai-plugin-mcd';
+import debug from 'debug';
+const log = debug('testrunner:engine');
 
 export default class Engine {
   constructor(options = {}) {
@@ -18,22 +20,34 @@ export default class Engine {
   }
 
   async run() {
+    log('running engine...');
+
     // TODO set this based on whether the plans/actions require a testchain
     const shouldUseTestchainClient = false;
+    const report = { results: [], success: true, completed: [] };
+    const failAtIndex = (index, error) => {
+      report.success = false;
+      report.error = error;
+      report.errorIndex = index;
+      return report;
+    };
 
     if (shouldUseTestchainClient) {
       this._client = createClient();
-      console.log(await this._client.api.listAllChains());
+      log(await this._client.api.listAllChains());
     } else if (this._options.url) {
-      this._maker = await Maker.create('http', {
-        url: this._options.url,
-        plugins: [[McdPlugin, { network: 'testnet' }]],
-        // autoAuthenticate: false
-      });
+      // n.b. this means that Maker is only set up when url is explicitly set--
+      // this is only temporary
+      try {
+        this._maker = await Maker.create('http', {
+          url: this._options.url,
+          plugins: [[McdPlugin, { network: 'testnet', prefetch: false }]],
+          log: false
+        });
+      } catch (error) {
+        return failAtIndex(-1, error);
+      }
     }
-
-    const report = { results: [], success: true, completed: [] };
-    let actors;
 
     const plan = this._options.plans
       ? this._importPlans(this._options.plans)
@@ -42,15 +56,15 @@ export default class Engine {
       this._options.actions || plan.actions
     );
 
+    let actors;
+    log('importing actors...');
     try {
       actors = await this._importActors(this._options.actors || plan.actors);
     } catch (error) {
-      report.success = false;
-      report.error = error;
-      report.errorIndex = -1;
-      return report;
+      return failAtIndex(-1, error);
     }
 
+    log('running actions...');
     for (const action of actions) {
       if (report.success) {
         const importedAction = ACTIONS[action[1]];
@@ -61,10 +75,8 @@ export default class Engine {
           const result = await this._runAction(importedAction, importedActor);
           report.results.push(result);
           report.completed.push(action);
-        } catch (err) {
-          report.success = false;
-          report.error = err;
-          report.errorIndex = 0 + report.results.length;
+        } catch (error) {
+          return failAtIndex(report.results.length, error);
         }
       }
     }
@@ -78,10 +90,7 @@ export default class Engine {
 
   async _runAction(action, actor) {
     const { before, operation, after } = action;
-
-    // TODO switch maker account to match actor
-    // use privateKeyAccountFactory
-
+    if (actor.address) this._maker.useAccountWithAddress(actor.address);
     if (before) await this._runStep(before.bind(action), actor);
     const result = await this._runStep(operation.bind(action), actor);
     if (after) await this._runStep(after.bind(action), actor);
