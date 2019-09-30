@@ -24,7 +24,7 @@ const keydata = {
 };
 
 // requires makerdao/testchain to be running
-test('connect to an arbitrary testchain with a specific account', async () => {
+xtest('connect to an arbitrary testchain with a specific account', async () => {
   await new Promise(r => setTimeout(r, 2000));
   fs.mkdirSync('/tmp/testrunner', { recursive: true });
   fs.writeFileSync('/tmp/testrunner/key', JSON.stringify(keydata));
