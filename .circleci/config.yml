@@ -6,10 +6,12 @@
      steps:
        - checkout
        - run:
+          name: Install dependencies
           command: |
             npm i --no-save yarn
             yarn
        - run:
+          name: Run tests
           command: |
             source /home/circleci/setup-env.sh
             yarn test
