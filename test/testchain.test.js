@@ -1,4 +1,4 @@
-import createClient from '../src/testchain';
+import createClient, { setTestchainDetails } from '../src/testchain';
 import createMaker from '../src/maker';
 
 beforeAll(() => {
@@ -7,6 +7,8 @@ beforeAll(() => {
 
 test('createClient returns a connected testchain client', async () => {
   const client = await createClient();
+  // await sleep(10000);
+  await setTestchainDetails(client.id);
   const networks = await client.api.listAllChains();
   expect(networks.data[0].id).toBeDefined();
 });
