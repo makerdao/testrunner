@@ -4,7 +4,7 @@ import { Client, Event } from '@makerdao/testchain-client';
 let cachedInstance;
 
 const backendEnv = 'dev';
-const defaultSnapshotId = '13219642453536798952';
+const defaultSnapshotId = '14730471878973369041';
 const testchainUrl = process.env.TESTCHAIN_URL || 'http://localhost:4000';
 const websocketUrl = process.env.websocketUrl || 'ws://127.1:4000/socket';
 
@@ -34,11 +34,6 @@ export default async () => {
 
   await global.client.init();
 
-  /*
-  client.create doesn't appear to be working here, so no testchain is created.
-  hard to debug on prod, but if you run the testchain_backend locally
-  it should log the error
-  */
   global.client.create(testchainConfig);
 
   const {

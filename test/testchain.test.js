@@ -1,13 +1,15 @@
 import createClient, { setTestchainDetails } from '../src/testchain';
 import createMaker from '../src/maker';
 
+export const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
 beforeAll(() => {
-  jest.setTimeout(8000);
+  jest.setTimeout(15000);
 });
 
 test('createClient returns a connected testchain client', async () => {
   const client = await createClient();
-  // await sleep(10000);
+  await sleep(10000);
   await setTestchainDetails(client.id);
   const networks = await client.api.listAllChains();
   expect(networks.data[0].id).toBeDefined();
