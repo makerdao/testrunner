@@ -5,7 +5,7 @@
        - image: levity/dapptools-node
      steps:
        - checkout
-       - run: /home/circleci/setup-env.sh
+       - run: source /home/circleci/setup-env.sh
        - run: npm i --no-save yarn
        - run: yarn
        - run: yarn test
