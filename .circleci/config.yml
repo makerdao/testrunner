@@ -2,11 +2,10 @@
  jobs:
    build:
      docker:
-       - image: circleci/node:lts
        - image: nixorg/nix:circleci
      steps:
        - checkout
-       - run: source ./scripts/install-dapptools.sh
+       - run: source ./scripts/install-ci-deps.sh
        - run: npm i --no-save yarn
        - run: yarn
        - run: yarn test

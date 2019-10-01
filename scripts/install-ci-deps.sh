@@ -10,5 +10,7 @@ export USER=circleci
 # curl https://dapp.tools/install | sh
 # . /home/circleci/.nix-profile/etc/profile.d/nix.sh
 
-git clone --recursive https://github.com/dapphub/dapptools $HOME/.dapp/dapptools
+git clone --recursive \
+  https://github.com/dapphub/dapptools \
+  $HOME/.dapp/dapptools
 nix-env -f $HOME/.dapp/dapptools -iA dapp seth solc hevm ethsign
