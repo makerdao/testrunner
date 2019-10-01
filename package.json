@@ -28,7 +28,7 @@
   },
   "scripts": {
     "testchain": "./node_modules/@makerdao/testchain/scripts/launch -s default --fast",
-    "test": "jest",
+    "test": "yarn testchain --ci jest",
     "precommit": "lint-staged",
     "cli": "node ./src/cli"
   },
