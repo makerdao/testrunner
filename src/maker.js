@@ -34,7 +34,9 @@ export default async () => {
 
   console.log('id', global.client.id);
 
-  const { details: chainData } = await global.client.api.getChain(global.client.id);
+  const { details: chainData } = await global.client.api.getChain(
+    global.client.id
+  );
 
   const accounts = getAccounts(chainData);
 
