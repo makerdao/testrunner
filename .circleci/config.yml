@@ -3,6 +3,7 @@
    build:
      docker:
        - image: circleci/node:lts
+       - image: nixorg/nix:circleci
      steps:
        - checkout
        - run: source ./scripts/install-dapptools.sh
