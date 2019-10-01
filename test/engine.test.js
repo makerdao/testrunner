@@ -1,10 +1,10 @@
 import Engine from '../src/engine';
 
 test('engine can run a simple plan', async () => {
-  const engine = new Engine();
-  const report = await engine.run({
+  const engine = new Engine({
     plans: ['selfTestA']
   });
+  const report = await engine.run();
 
   expect(report).toEqual({
     success: true,
@@ -14,10 +14,10 @@ test('engine can run a simple plan', async () => {
 });
 
 test('engine can run multiple simple plans', async () => {
-  const engine = new Engine();
-  const report = await engine.run({
+  const engine = new Engine({
     plans: ['selfTestA', 'selfTestB']
   });
+  const report = await engine.run();
 
   expect(report).toEqual({
     results: ['0xa', '0xa', '0xb'],
@@ -31,11 +31,11 @@ test('engine can run multiple simple plans', async () => {
 });
 
 test('engine can run an explicit series of actors and actions', async () => {
-  const engine = new Engine();
-  const report = await engine.run({
+  const engine = new Engine({
     actors: { user1: 'selfTestUser' },
     actions: [['user1', 'checkUser']]
   });
+  const report = await engine.run();
 
   expect(report).toEqual({
     success: true,
@@ -45,8 +45,7 @@ test('engine can run an explicit series of actors and actions', async () => {
 });
 
 test('when engine fails before, it stops immediately and updates report with error info', async () => {
-  const engine = new Engine();
-  const report = await engine.run({
+  const engine = new Engine({
     actors: { user1: 'selfTestUser' },
     actions: [
       ['user1', 'checkUser'],
@@ -54,6 +53,7 @@ test('when engine fails before, it stops immediately and updates report with err
       ['user1', 'checkUser']
     ]
   });
+  const report = await engine.run();
 
   expect(report).toEqual({
     success: false,
@@ -66,8 +66,7 @@ test('when engine fails before, it stops immediately and updates report with err
 });
 
 test('when engine fails during operation, it stops immediately and updates report with error info', async () => {
-  const engine = new Engine();
-  const report = await engine.run({
+  const engine = new Engine({
     actors: { user1: 'selfTestUser' },
     actions: [
       ['user1', 'checkUser'],
@@ -75,6 +74,7 @@ test('when engine fails during operation, it stops immediately and updates repor
       ['user1', 'checkUser']
     ]
   });
+  const report = await engine.run();
 
   expect(report).toEqual({
     success: false,
@@ -87,8 +87,7 @@ test('when engine fails during operation, it stops immediately and updates repor
 });
 
 test('when engine fails after, it stops immediately and updates report with error info', async () => {
-  const engine = new Engine();
-  const report = await engine.run({
+  const engine = new Engine({
     actors: { user1: 'selfTestUser' },
     actions: [
       ['user1', 'checkUser'],
@@ -96,6 +95,7 @@ test('when engine fails after, it stops immediately and updates report with erro
       ['user1', 'checkUser']
     ]
   });
+  const report = await engine.run();
 
   expect(report).toEqual({
     success: false,
@@ -108,7 +108,6 @@ test('when engine fails after, it stops immediately and updates report with erro
 });
 
 test('engine can randomize nested actions', async () => {
-  const engine = new Engine();
   const actorsAndActions = {
     actors: {
       user1: 'selfTestUser',
@@ -137,35 +136,36 @@ test('engine can randomize nested actions', async () => {
       ['user2', 'checkUser']
     ]
   };
-  const report1 = await engine.run({ ...actorsAndActions });
-  let report2 = await engine.run({ ...actorsAndActions });
+  const engine = new Engine({ ...actorsAndActions });
+  const report1 = await engine.run();
+  let report2 = await engine.run();
 
   if (report1 === report2) {
-    report2 = await engine.run({ ...actorsAndActions });
+    report2 = await engine.run();
   }
 
   expect(report1).not.toEqual(report2);
 });
 
 test('engine can randomize nested actions from imported plans', async () => {
-  const engine = new Engine();
-  const report1 = await engine.run({ plans: ['selfTestC'] });
-  let report2 = await engine.run({ plans: ['selfTestC'] });
+  const engine = new Engine({ plans: ['selfTestC'] });
+  const report1 = await engine.run();
+  let report2 = await engine.run();
 
   if (report1 === report2) {
-    report2 = await engine.run({ plans: ['selfTestC'] });
+    report2 = await engine.run();
   }
 
   expect(report1).not.toEqual(report2);
 });
 
 test('engine can randomize all actions when plan mode is set to random', async () => {
-  const engine = new Engine();
-  const report1 = await engine.run({ plans: ['selfTestD'] });
-  let report2 = await engine.run({ plans: ['selfTestD'] });
+  const engine = new Engine({ plans: ['selfTestD'] });
+  const report1 = await engine.run();
+  let report2 = await engine.run();
 
   if (report1 === report2) {
-    report2 = await engine.run({ plans: ['selfTestD'] });
+    report2 = await engine.run();
   }
 
   expect(report1).not.toEqual(report2);
@@ -191,9 +191,9 @@ test('engine throws when given invalid plans, actions, or actors', async () => {
 });
 
 async function testRunError(params) {
-  const engine = new Engine();
   try {
-    return await engine.run(params);
+    const engine = new Engine(params);
+    return engine.run();
   } catch (err) {
     return err.message;
   }

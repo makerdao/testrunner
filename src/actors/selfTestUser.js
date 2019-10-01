@@ -11,7 +11,7 @@ const keys = {
   user10: '0xj'
 };
 
-export default function(name) {
+export default async function(name) {
   return {
     privateKey: keys[name],
     name: name
