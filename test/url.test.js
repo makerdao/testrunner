@@ -23,6 +23,16 @@ const keydata = {
   version: 3
 };
 
+let ethRpcAccounts;
+beforeAll(() => {
+  ethRpcAccounts = process.env.ETH_RPC_ACCOUNTS;
+  process.env.ETH_RPC_ACCOUNTS = '';
+});
+
+afterAll(() => {
+  process.env.ETH_RPC_ACCOUNTS = ethRpcAccounts;
+});
+
 // requires makerdao/testchain to be running
 xtest('connect to an arbitrary testchain with a specific account', async () => {
   await new Promise(r => setTimeout(r, 2000));

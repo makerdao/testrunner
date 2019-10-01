@@ -20,7 +20,7 @@ export default class Engine {
   }
 
   async run() {
-    log('running engine...');
+    log('running...');
 
     // TODO set this based on whether the plans/actions require a testchain
     const shouldUseTestchainClient = false;
@@ -117,6 +117,7 @@ export default class Engine {
         this._maker,
         this._options
       );
+      log(`imported actor: ${name}`);
     }
     return result;
   }

@@ -26,13 +26,12 @@ export default async function(name, maker, options) {
 }
 
 function findKeyFromStore(address, keystore, password) {
-  log('findKeyFromStore');
   assert(keystore, '--keystore or ETH_KEYSTORE must be set');
 
   let key;
   for (const filename of fs.readdirSync(keystore)) {
-    log(`trying ${filename}`);
-    const file = fs.readFileSync(path.join(keystore, filename)).toString();
+    const fullpath = path.join(keystore, filename);
+    const file = fs.readFileSync(fullpath).toString();
 
     try {
       const data = JSON.parse(file);
@@ -40,10 +39,9 @@ function findKeyFromStore(address, keystore, password) {
     } catch (err) {
       continue;
     }
-    log(`found matching keystore file at ${filename}`);
+    log(`found matching keystore file at ${fullpath}`);
     const wallet = fromV3(file, password);
     key = wallet._privKey.toString('hex');
-    log(key);
     break;
   }
 
