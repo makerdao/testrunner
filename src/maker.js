@@ -50,8 +50,8 @@ export default async () => {
     url: chainData.chain_details.rpc_url,
     network: 'ganache',
     privateKey: accounts.owner.privateKey,
-    accounts
-    // deploy_step: 1
+    accounts,
+    deploy_step: 1
   };
 
   let maker;

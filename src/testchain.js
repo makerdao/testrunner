@@ -5,8 +5,8 @@ let cachedInstance;
 
 const backendEnv = 'dev';
 const defaultSnapshotId = '13219642453536798952';
-const testchainUrl = 'process.env.TESTCHAIN_URL' || 'http://localhost:4000';
-const websocketUrl = 'process.env.websocketUrl' || 'http://127.1:4000/socket';
+const testchainUrl = process.env.TESTCHAIN_URL || 'http://localhost:4000';
+const websocketUrl = process.env.websocketUrl || 'ws://127.1:4000/socket';
 
 // const backendEnv = 'prod'
 // const defaultSnapshotId = '6925561923190355037'
@@ -58,7 +58,7 @@ export const setTestchainDetails = async id => {
     details: {
       chain_details: { rpc_url }
     }
-  } = await global.client.api.getChain(id);
+  } = await global.client.api.getChain(global.client.id);
 
   global.backendEnv = backendEnv;
   global.defaultSnapshotId = defaultSnapshotId;
