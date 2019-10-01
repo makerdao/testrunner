@@ -5,8 +5,7 @@
        - image: circleci/node:lts
      steps:
        - checkout
-       - run: pwd
-       - run: ls
+       - run: source ./scripts/install-dapptools.sh
        - run: npm i --no-save yarn
        - run: yarn
        - run: yarn test
