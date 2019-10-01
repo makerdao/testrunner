@@ -4,36 +4,67 @@ import PLANS from './plans';
 import createClient from './testchain';
 import assert from 'assert';
 import shuffle from 'lodash/shuffle';
+import Maker from '@makerdao/dai';
+import McdPlugin from '@makerdao/dai-plugin-mcd';
+import debug from 'debug';
+const log = debug('testrunner:engine');
 
 export default class Engine {
-  constructor() {}
-
-  async run({ plans, actions, actors } = {}) {
+  constructor(options = {}) {
+    const { plans, actions, actors } = options;
     assert(
-      (plans || (actors && actions)) && Object.keys(arguments[0]).length < 3,
+      plans || (actors && actions),
       'Must provide { plans } OR { actors, actions }, but not both'
     );
+    this._options = options;
+  }
+
+  async run() {
+    log('running...');
 
     // TODO set this based on whether the plans/actions require a testchain
     const shouldUseTestchainClient = false;
+    const report = { results: [], success: true, completed: [] };
+    const failAtIndex = (index, error) => {
+      report.success = false;
+      report.error = error;
+      report.errorIndex = index;
+      return report;
+    };
 
     if (shouldUseTestchainClient) {
       this._client = createClient();
-      console.log(await this._client.api.listAllChains());
+      log(await this._client.api.listAllChains());
+    } else if (this._options.url) {
+      // n.b. this means that Maker is only set up when url is explicitly set--
+      // this is only temporary
+      try {
+        this._maker = await Maker.create('http', {
+          url: this._options.url,
+          plugins: [[McdPlugin, { network: 'testnet', prefetch: false }]],
+          log: false
+        });
+      } catch (error) {
+        return failAtIndex(-1, error);
+      }
     }
 
-    const plan = plans ? this._importPlans(plans) : null;
-    actions = actions
-      ? this._randomActionCheck(actions)
-      : this._randomActionCheck(plan.actions);
-    actors = actors ? this._importActors(actors) : plan.actors;
+    const plan = this._options.plans
+      ? this._importPlans(this._options.plans)
+      : null;
+    const actions = this._randomActionCheck(
+      this._options.actions || plan.actions
+    );
 
-    let report = {
-      results: [],
-      success: true,
-      completed: []
-    };
+    let actors;
+    log('importing actors...');
+    try {
+      actors = await this._importActors(this._options.actors || plan.actors);
+    } catch (error) {
+      return failAtIndex(-1, error);
+    }
 
+    log('running actions...');
     for (const action of actions) {
       if (report.success) {
         const importedAction = ACTIONS[action[1]];
@@ -44,10 +75,8 @@ export default class Engine {
           const result = await this._runAction(importedAction, importedActor);
           report.results.push(result);
           report.completed.push(action);
-        } catch (err) {
-          report.success = false;
-          report.error = err;
-          report.errorIndex = 0 + report.results.length;
+        } catch (error) {
+          return failAtIndex(report.results.length, error);
         }
       }
     }
@@ -55,25 +84,42 @@ export default class Engine {
     return report;
   }
 
+  async stop() {
+    // TODO
+  }
+
   async _runAction(action, actor) {
-    if (action.before) await action.before(actor);
-    const result = await action.operation(actor);
-    if (action.after) await action.after(actor);
+    const { before, operation, after } = action;
+    if (actor.address) this._maker.useAccountWithAddress(actor.address);
+    if (before) await this._runStep(before.bind(action), actor);
+    const result = await this._runStep(operation.bind(action), actor);
+    if (after) await this._runStep(after.bind(action), actor);
     return result;
   }
 
-  _importActors(actors) {
-    return Object.keys(actors).reduce((result, name) => {
+  _runStep(step, actor) {
+    assert(
+      step.length < 2 || this._maker,
+      'Action requires Maker instance but none exists'
+    );
+    return step(actor, this._maker);
+  }
+
+  async _importActors(actors) {
+    const result = {};
+    for (let name of Object.keys(actors)) {
       assert(
         ACTORS[actors[name]],
         `Could not import actor: { ${name}: ${actors[name]} }`
       );
-      result[name] = ACTORS[actors[name]](name);
-      if (!result[name].privateKey) {
-        console.warn(`{ ${name}: ${actors[name]} } has no private key!`);
-      }
-      return result;
-    }, {});
+      result[name] = await ACTORS[actors[name]](
+        name,
+        this._maker,
+        this._options
+      );
+      log(`imported actor: ${name}`);
+    }
+    return result;
   }
 
   _importPlans(plans) {
@@ -81,20 +127,13 @@ export default class Engine {
       (result, plan) => {
         const importedPlan = PLANS[plan];
         assert(importedPlan, `Could not import plan: ${plan}`);
-
-        result.actors = {
-          ...result.actors,
-          ...this._importActors(importedPlan.actors)
-        };
+        result.actors = { ...result.actors, ...importedPlan.actors };
 
         const actions =
           importedPlan.mode === 'random'
             ? shuffle(importedPlan.actions)
             : importedPlan.actions;
-        actions.forEach(action => {
-          result.actions.push(action);
-        });
-
+        result.actions = result.actions.concat(actions);
         return result;
       },
       { actors: {}, actions: [] }

@@ -5,6 +5,6 @@
        - image: circleci/node:lts
      steps:
        - checkout
-       - run: npm i yarn
+       - run: npm i --no-save yarn
        - run: yarn
        - run: yarn test
