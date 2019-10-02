@@ -834,13 +834,22 @@
     "@types/istanbul-reports" "^1.1.1"
     "@types/yargs" "^13.0.0"
 
-"@makerdao/currency@^0.9.5":
+"@makerdao/currency@^0.9.3", "@makerdao/currency@^0.9.5":
   version "0.9.6"
   resolved "https://registry.yarnpkg.com/@makerdao/currency/-/currency-0.9.6.tgz#ff2cac6869de40ed3965137ce08442c390add7a4"
   integrity sha512-V7jepuYI2W1+OgbwJACU2fE+1C2U01GzDWZVxeT9BTJPPSiDsu5jRepHLHaL+HEwIL9e/RmTcJDSgeST0zsOzA==
   dependencies:
     babel-runtime "^6.26.0"
     bignumber.js "^8.1.1"
+
+"@makerdao/dai-plugin-config@^0.2.14-rc.1":
+  version "0.2.14-rc.1"
+  resolved "https://registry.yarnpkg.com/@makerdao/dai-plugin-config/-/dai-plugin-config-0.2.14-rc.1.tgz#4a366b44895625c8f0e9a29ff46ed295a5bb2d9d"
+  integrity sha512-akufFOb+HU8sNPaKhr1+xsJGvUnaZu0efjeF6zZdYCv5iw3o8hJD6svvLEJvr+KAJVlGLpwmNgbPc96GCZAfPg==
+  dependencies:
+    "@makerdao/currency" "^0.9.3"
+    babel-runtime "^6.26.0"
+    ramda "^0.26.1"
 
 "@makerdao/dai-plugin-mcd@^0.2.14-rc.1":
   version "0.2.14-rc.1"
@@ -893,10 +902,10 @@
     lodash "^4.17.15"
     toposort "^2.0.2"
 
-"@makerdao/testchain-client@^0.2.6-rc.1":
-  version "0.2.6-rc.1"
-  resolved "https://registry.yarnpkg.com/@makerdao/testchain-client/-/testchain-client-0.2.6-rc.1.tgz#e77dc4c80466917230c3de4180ea3bd15d5fd22a"
-  integrity sha512-2Rm4JxAd64FiZblIgag/B3u6gZUbOeamAlQ0BcruyG0fZw7fLrXfpfCs56qizXmubhKuV9kLjnIg9vZy/VcZzg==
+"@makerdao/testchain-client@^0.2.14-rc.1":
+  version "0.2.14-rc.1"
+  resolved "https://registry.yarnpkg.com/@makerdao/testchain-client/-/testchain-client-0.2.14-rc.1.tgz#c353b88cedd71e86586366d2a8fd131c6c960490"
+  integrity sha512-kLZiEL96WEnuUTXeu38YYymc7yxg6O7aSjrZUksNYyb6ewv4wv0kZ+PrfwTPj0iD6bX63vuS/c+0YW1UV6iY/Q==
   dependencies:
     babel-runtime "^6.26.0"
     debug "^4.1.1"
@@ -3977,7 +3986,7 @@ functional-red-black-tree@^1.0.1:
   resolved "https://registry.yarnpkg.com/functional-red-black-tree/-/functional-red-black-tree-1.0.1.tgz#1b0ab3bd553b2a0d6399d29c0e3ea0b252078327"
   integrity sha1-GwqzvVU7Kg1jmdKcDj6gslIHgyc=
 
-"ganache-cli@github:makerdao/ganache-cli#fix/gas-est-crash":
+ganache-cli@makerdao/ganache-cli#fix/gas-est-crash:
   version "6.4.3-beta.0"
   resolved "https://codeload.github.com/makerdao/ganache-cli/tar.gz/3e512b61da2479042627e6155231dcb038110650"
   dependencies:

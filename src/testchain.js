@@ -1,26 +1,79 @@
-import { Client } from '@makerdao/testchain-client';
+import { Client, Event } from '@makerdao/testchain-client';
+import { asyncForEach, sleep } from '../test/helpers/utils';
 
-let cachedInstance;
-// We should make caching optional
+// const backendEnv = 'dev';
+// const defaultSnapshotId = '17833036062267713253';
+// const testchainUrl = process.env.TESTCHAIN_URL || 'http://localhost:4000';
+// const websocketUrl = process.env.websocketUrl || 'ws://127.1:4000/socket';
 
-export default function createClient() {
+const backendEnv = 'prod';
+const defaultSnapshotId = '13978968591367274503';
+const testchainUrl = 'http://18.185.172.121:4000';
+const websocketUrl = 'ws://18.185.172.121:4000/socket';
+
+const testchainConfig = {
+  accounts: 3,
+  block_mine_time: 0,
+  clean_on_stop: true,
+  description: 'DaiPluginDefaultremote1',
+  type: 'geth', // the restart testchain process doesn't work well with ganache
+  snapshot_id: defaultSnapshotId
+};
+
+export default async () => {
+  const client = new Client(testchainUrl, websocketUrl);
+  await client.init();
+  return client;
+};
+
+export const createTestchain = async client => {
   // We should probably accept an object of
   // options here with the below as defaults
+  client.create(testchainConfig);
 
-  if (cachedInstance) return cachedInstance;
+  const {
+    payload: {
+      response: { id }
+    }
+  } = await client.once('api', Event.OK);
 
-  const client = new Client(
-    // 'http://localhost:4000'
-    'https://testchain-backendgatway.makerfoundation.com:4001'
-  );
-  client.init();
-  client.create({
-    clean_on_stop: false,
-    chainType: 'ganache',
-    block_mine_time: 0,
-    accounts: 3
+  return id;
+};
+
+export const setTestchainDetails = async (client, testchainId) => {
+  const {
+    details: {
+      chain_details: { rpc_url }
+    }
+  } = await client.api.getChain(testchainId);
+
+  return {
+    backendEnv,
+    defaultSnapshotId,
+    testchainPort: rpc_url.substr(rpc_url.length - 4),
+    rpcUrl: rpc_url.includes('.local')
+      ? `http://localhost:${global.testchainPort}`
+      : rpc_url
+  };
+};
+
+// Chains need to be stopped first, then deleted
+export const removeConnectedChain = async (client, testchainId) => {
+  console.log('chain to delete', testchainId);
+  await client.stop(testchainId);
+  await sleep(10000);
+  await client.api.deleteChain(testchainId);
+  await sleep(10000);
+};
+
+export const stopAllChains = async (chains, client) => {
+  await asyncForEach(chains, async chain => {
+    await client.stop(chain.id);
   });
-  cachedInstance = client;
+};
 
-  return client;
-}
+export const deleteAllChains = async (chains, client) => {
+  await asyncForEach(chains, async chain => {
+    await client.api.deleteChain(chain.id);
+  });
+};
