@@ -4,7 +4,7 @@ import { Client, Event } from '@makerdao/testchain-client';
 let cachedInstance;
 
 const backendEnv = 'dev';
-const defaultSnapshotId = '17833036062267713253';
+const defaultSnapshotId = '8523365564918950365';
 const testchainUrl = process.env.TESTCHAIN_URL || 'http://localhost:4000';
 const websocketUrl = process.env.websocketUrl || 'ws://127.1:4000/socket';
 
@@ -20,6 +20,7 @@ const testchainConfig = {
   description: 'DaiPluginDefaultremote1',
   type: 'geth', // the restart testchain process doesn't work well with ganache
   snapshot_id: defaultSnapshotId
+  // network_id: 1337 // for geth this is required
 };
 
 export default async () => {
@@ -34,31 +35,35 @@ export default async () => {
 
   await global.client.init();
 
+  cachedInstance = client;
+  return global.client;
+};
+
+export const createTestchain = async () => {
   global.client.create(testchainConfig);
 
   const {
     payload: {
       response: { id }
     }
-  } = await client.once('api', Event.OK);
+  } = await global.client.once('api', Event.OK);
 
-  global.client.id = id;
-
-  cachedInstance = client;
-  return global.client;
+  global.testchainId = id;
+  return global.testchainId;
 };
 
-export const setTestchainDetails = async id => {
+export const setTestchainDetails = async () => {
+  console.log('ID for testchain', global.testchainId);
   const {
     details: {
       chain_details: { rpc_url }
     }
-  } = await global.client.api.getChain(global.client.id);
+  } = await global.client.api.getChain(global.testchainId);
 
   global.backendEnv = backendEnv;
   global.defaultSnapshotId = defaultSnapshotId;
   global.testchainPort = rpc_url.substr(rpc_url.length - 4);
-  global.testchainId = id;
+  // global.testchainId = id;
   global.rpcUrl = rpc_url.includes('.local')
     ? `http://localhost:${global.testchainPort}`
     : rpc_url;

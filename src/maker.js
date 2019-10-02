@@ -16,8 +16,8 @@ function getAccounts(chainData) {
   const otherAccounts = deployedAccounts.filter(
     account => account !== coinbaseAccount
   );
-  //only 2 remaining accounts, so got rid of 'ava'
-  const accounts = ['ali', 'sam'].reduce((result, name, i) => {
+
+  const accounts = ['ali', 'sam', 'ava'].reduce((result, name, i) => {
     result[name] = {
       type: 'privateKey',
       key: otherAccounts[i].priv_key
@@ -32,10 +32,10 @@ function getAccounts(chainData) {
 export default async () => {
   // const client = await createClient();
 
-  console.log('id', global.client.id);
+  console.log('id', global.testchainId);
 
   const { details: chainData } = await global.client.api.getChain(
-    global.client.id
+    global.testchainId
   );
 
   const accounts = getAccounts(chainData);
@@ -44,16 +44,16 @@ export default async () => {
     plugins: [
       [daiPlugin, { prefetch: true }],
       // since the Client is created with prod URL, backendEnv should be prod here:
-      [configPlugin, { testchainId: global.client.id, backendEnv: backendEnv }]
+      [
+        configPlugin,
+        { testchainId: global.testchainId, backendEnv: backendEnv }
+      ]
     ],
     log: true,
-    url: chainData.chain_details.rpc_url,
-    network: 'geth',
-    privateKey: accounts.owner.privateKey,
-    accounts,
-    deploy_step: 1
+    url: global.rpcUrl,
+    accounts
   };
-  console.log('sup')
+  console.log('sup', config);
   let maker;
 
   try {
@@ -61,11 +61,11 @@ export default async () => {
     // for multiple contracts here when MCD plugin
     // is included; I think we need to use different
     // contract addresses for the different testchain
-    console.log('in the try block')
+    console.log('in the try block');
     maker = await Maker.create('http', config);
-    console.log('maker created')
+    console.log('maker created');
     await maker.authenticate();
-    console.log('maker authenticated')
+    console.log('maker authenticated');
   } catch (err) {
     console.error(err);
   }
