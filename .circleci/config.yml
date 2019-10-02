@@ -2,9 +2,16 @@
  jobs:
    build:
      docker:
-       - image: circleci/node:lts
+       - image: levity/dapptools-node
      steps:
        - checkout
-       - run: npm i --no-save yarn
-       - run: yarn
-       - run: yarn test
+       - run:
+          name: Install dependencies
+          command: |
+            npm i --no-save yarn
+            yarn
+       - run:
+          name: Run tests
+          command: |
+            source /home/circleci/setup-env.sh
+            yarn test
