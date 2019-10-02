@@ -4,12 +4,12 @@ import createMaker from '../src/maker';
 export const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 beforeAll(() => {
-  jest.setTimeout(15000);
+  jest.setTimeout(30000);
 });
 
 test('createClient returns a connected testchain client', async () => {
   const client = await createClient();
-  await sleep(10000);
+  await sleep(15000);
   await setTestchainDetails(client.id);
   const networks = await client.api.listAllChains();
   expect(networks.data[0].id).toBeDefined();

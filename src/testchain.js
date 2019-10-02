@@ -4,7 +4,7 @@ import { Client, Event } from '@makerdao/testchain-client';
 let cachedInstance;
 
 const backendEnv = 'dev';
-const defaultSnapshotId = '14730471878973369041';
+const defaultSnapshotId = '17833036062267713253';
 const testchainUrl = process.env.TESTCHAIN_URL || 'http://localhost:4000';
 const websocketUrl = process.env.websocketUrl || 'ws://127.1:4000/socket';
 

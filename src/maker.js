@@ -48,12 +48,12 @@ export default async () => {
     ],
     log: true,
     url: chainData.chain_details.rpc_url,
-    network: 'ganache',
+    network: 'geth',
     privateKey: accounts.owner.privateKey,
     accounts,
     deploy_step: 1
   };
-
+  console.log('sup')
   let maker;
 
   try {
@@ -61,8 +61,11 @@ export default async () => {
     // for multiple contracts here when MCD plugin
     // is included; I think we need to use different
     // contract addresses for the different testchain
+    console.log('in the try block')
     maker = await Maker.create('http', config);
+    console.log('maker created')
     await maker.authenticate();
+    console.log('maker authenticated')
   } catch (err) {
     console.error(err);
   }
