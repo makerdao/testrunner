@@ -1,10 +1,11 @@
 import { Client, Event } from '@makerdao/testchain-client';
+import { asyncForEach, sleep } from '../test/helpers/utils';
 
 // We should make caching optional
 let cachedInstance;
 
 const backendEnv = 'dev';
-const defaultSnapshotId = '8523365564918950365';
+const defaultSnapshotId = '17833036062267713253';
 const testchainUrl = process.env.TESTCHAIN_URL || 'http://localhost:4000';
 const websocketUrl = process.env.websocketUrl || 'ws://127.1:4000/socket';
 
@@ -20,7 +21,6 @@ const testchainConfig = {
   description: 'DaiPluginDefaultremote1',
   type: 'geth', // the restart testchain process doesn't work well with ganache
   snapshot_id: defaultSnapshotId
-  // network_id: 1337 // for geth this is required
 };
 
 export default async () => {
@@ -67,4 +67,25 @@ export const setTestchainDetails = async () => {
   global.rpcUrl = rpc_url.includes('.local')
     ? `http://localhost:${global.testchainPort}`
     : rpc_url;
+};
+
+// Chains need to be stopped first, then deleted
+export const removeConnectedChain = async () => {
+  console.log('chain to delete', global.testchainId);
+  await global.client.stop(global.testchainId);
+  await sleep(10000);
+  await global.client.api.deleteChain(global.testchainId);
+  await sleep(10000);
+};
+
+export const stopAllChains = async (chains, client) => {
+  await asyncForEach(chains, async chain => {
+    await client.stop(chain.id);
+  });
+};
+
+export const deleteAllChains = async (chains, client) => {
+  await asyncForEach(chains, async chain => {
+    await client.api.deleteChain(chain.id);
+  });
 };

@@ -29,7 +29,7 @@
   },
   "scripts": {
     "testchain": "./node_modules/@makerdao/testchain/scripts/launch -s default --fast",
-    "test": "jest",
+    "test": "jest --runInBand",
     "precommit": "lint-staged",
     "cli": "node ./src/cli"
   },
