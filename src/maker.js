@@ -2,8 +2,8 @@ import Maker from '@makerdao/dai';
 import daiPlugin from '@makerdao/dai-plugin-mcd';
 import configPlugin from '@makerdao/dai-plugin-config';
 
-const backendEnv = 'dev';
-// const backendEnv = 'prod'
+// const backendEnv = 'dev';
+const backendEnv = 'prod'
 
 function getAccounts(chainData) {
   // I just pulled this stuff out of createMaker so it
@@ -17,7 +17,7 @@ function getAccounts(chainData) {
     account => account !== coinbaseAccount
   );
 
-  const accounts = ['ali', 'sam', 'ava'].reduce((result, name, i) => {
+  const accounts = ['ali', 'sam'].reduce((result, name, i) => {
     result[name] = {
       type: 'privateKey',
       key: otherAccounts[i].priv_key
