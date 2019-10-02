@@ -7,10 +7,6 @@ jobs:
       - checkout
       - run: npm i yarn
       - run: yarn
-  install-docker-compose:
-    docker:
-      - image: circleci/node:lts
-    steps:
       - run: |
           curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
           chmod +x ~/docker-compose
@@ -32,8 +28,6 @@ workflows:
   build_and_test:
     jobs:
       - build
-      - install-docker-compose
       - test:
           requires:
             - build
-            - install-docker-compose
