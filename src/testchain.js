@@ -9,10 +9,10 @@ let cachedInstance;
 // const testchainUrl = process.env.TESTCHAIN_URL || 'http://localhost:4000';
 // const websocketUrl = process.env.websocketUrl || 'ws://127.1:4000/socket';
 
-const backendEnv = 'prod'
-const defaultSnapshotId = '13978968591367274503'
-const testchainUrl = 'http://18.185.172.121:4000'
-const websocketUrl = 'ws://18.185.172.121:4000/socket'
+const backendEnv = 'prod';
+const defaultSnapshotId = '13978968591367274503';
+const testchainUrl = 'http://18.185.172.121:4000';
+const websocketUrl = 'ws://18.185.172.121:4000/socket';
 
 const testchainConfig = {
   accounts: 3,

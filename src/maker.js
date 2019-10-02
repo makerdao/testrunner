@@ -3,7 +3,7 @@ import daiPlugin from '@makerdao/dai-plugin-mcd';
 import configPlugin from '@makerdao/dai-plugin-config';
 
 // const backendEnv = 'dev';
-const backendEnv = 'prod'
+const backendEnv = 'prod';
 
 function getAccounts(chainData) {
   // I just pulled this stuff out of createMaker so it
