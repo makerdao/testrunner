@@ -38,7 +38,7 @@ test('createMaker returns a connected maker instance with accounts', async () =>
   expect(maker).toBeDefined();
 
   const accounts = maker.service('accounts').listAccounts();
-  // console.log('accounts', accounts);
+
   // Four accounts added via testchainConfig including "owner"/coinbase
   expect(accounts.length).toBe(3);
 });
