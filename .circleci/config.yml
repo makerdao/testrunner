@@ -16,7 +16,7 @@ jobs:
       - run: |
           git clone https://github.com/makerdao/staxx.git
           cd staxx
-          docker-compose
+          docker-compose up
           make run-dev
           cd ..
           yarn test
