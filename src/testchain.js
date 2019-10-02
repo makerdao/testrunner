@@ -53,7 +53,6 @@ export const createTestchain = async () => {
 };
 
 export const setTestchainDetails = async () => {
-  console.log('ID for testchain', global.testchainId);
   const {
     details: {
       chain_details: { rpc_url }

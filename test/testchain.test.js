@@ -20,7 +20,6 @@ afterAll(async done => {
 test('createTestchain returns a connected testchain', async () => {
   await createTestchain();
   await sleep(15000);
-  console.log('global ID', global.testchainId);
   await setTestchainDetails();
   const networks = await global.client.api.listAllChains();
   expect(networks.data[0].id).toBeDefined();
@@ -31,7 +30,7 @@ test('createMaker returns a connected maker instance with accounts', async () =>
   expect(maker).toBeDefined();
 
   const accounts = maker.service('accounts').listAccounts();
-  console.log('accounts', accounts);
+  // console.log('accounts', accounts);
   // Four accounts added via testchainConfig including "owner"/coinbase
   expect(accounts.length).toBe(3);
 });

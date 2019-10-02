@@ -31,9 +31,6 @@ function getAccounts(chainData) {
 
 export default async () => {
   // const client = await createClient();
-
-  console.log('id', global.testchainId);
-
   const { details: chainData } = await global.client.api.getChain(
     global.testchainId
   );
@@ -53,7 +50,6 @@ export default async () => {
     url: global.rpcUrl,
     accounts
   };
-  console.log('sup', config);
   let maker;
 
   try {
@@ -61,11 +57,8 @@ export default async () => {
     // for multiple contracts here when MCD plugin
     // is included; I think we need to use different
     // contract addresses for the different testchain
-    console.log('in the try block');
     maker = await Maker.create('http', config);
-    console.log('maker created');
     await maker.authenticate();
-    console.log('maker authenticated');
   } catch (err) {
     console.error(err);
   }
