@@ -2,7 +2,7 @@ import { Client, Event } from '@makerdao/testchain-client';
 import { asyncForEach, sleep } from '../test/helpers/utils';
 
 // We should make caching optional
-let cachedInstance;
+// let cachedInstance;
 
 // const backendEnv = 'dev';
 // const defaultSnapshotId = '17833036062267713253';
@@ -27,53 +27,59 @@ export default async () => {
   // We should probably accept an object of
   // options here with the below as defaults
 
-  if (cachedInstance) return cachedInstance;
+  // if (cachedInstance) return cachedInstance;
 
   const client = new Client(testchainUrl, websocketUrl);
 
-  global.client = client;
+  await client.init();
 
-  await global.client.init();
+  // cachedInstance = client;
 
-  cachedInstance = client;
-  return global.client;
+  return client;
 };
 
-export const createTestchain = async () => {
-  global.client.create(testchainConfig);
+export const createTestchain = async client => {
+  client.create(testchainConfig);
 
   const {
     payload: {
       response: { id }
     }
-  } = await global.client.once('api', Event.OK);
+  } = await client.once('api', Event.OK);
 
-  global.testchainId = id;
-  return global.testchainId;
+  return id;
 };
 
-export const setTestchainDetails = async () => {
+export const setTestchainDetails = async (client, testchainId) => {
   const {
     details: {
       chain_details: { rpc_url }
     }
-  } = await global.client.api.getChain(global.testchainId);
+  } = await client.api.getChain(testchainId);
 
-  global.backendEnv = backendEnv;
-  global.defaultSnapshotId = defaultSnapshotId;
-  global.testchainPort = rpc_url.substr(rpc_url.length - 4);
-  // global.testchainId = id;
-  global.rpcUrl = rpc_url.includes('.local')
-    ? `http://localhost:${global.testchainPort}`
-    : rpc_url;
+  // global.backendEnv = backendEnv;
+  // global.defaultSnapshotId = defaultSnapshotId;
+  // global.testchainPort = rpc_url.substr(rpc_url.length - 4);
+  // // global.testchainId = id;
+  // global.rpcUrl = rpc_url.includes('.local')
+  //   ? `http://localhost:${global.testchainPort}`
+  //   : rpc_url;
+  return {
+    backendEnv,
+    defaultSnapshotId,
+    testchainPort: rpc_url.substr(rpc_url.length - 4),
+    rpcUrl: rpc_url.includes('.local')
+      ? `http://localhost:${global.testchainPort}`
+      : rpc_url
+  };
 };
 
 // Chains need to be stopped first, then deleted
-export const removeConnectedChain = async () => {
-  console.log('chain to delete', global.testchainId);
-  await global.client.stop(global.testchainId);
+export const removeConnectedChain = async (client, testchainId) => {
+  console.log('chain to delete', testchainId);
+  await client.stop(testchainId);
   await sleep(10000);
-  await global.client.api.deleteChain(global.testchainId);
+  await client.api.deleteChain(testchainId);
   await sleep(10000);
 };
 

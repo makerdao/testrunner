@@ -29,11 +29,9 @@ function getAccounts(chainData) {
   return accounts;
 }
 
-export default async () => {
+export default async (client, testchainId, options) => {
   // const client = await createClient();
-  const { details: chainData } = await global.client.api.getChain(
-    global.testchainId
-  );
+  const { details: chainData } = await client.api.getChain(testchainId);
 
   const accounts = getAccounts(chainData);
 
@@ -41,13 +39,10 @@ export default async () => {
     plugins: [
       [daiPlugin, { prefetch: true }],
       // since the Client is created with prod URL, backendEnv should be prod here:
-      [
-        configPlugin,
-        { testchainId: global.testchainId, backendEnv: backendEnv }
-      ]
+      [configPlugin, { testchainId: testchainId, backendEnv: backendEnv }]
     ],
     log: true,
-    url: global.rpcUrl,
+    url: options.rpcUrl,
     accounts
   };
   let maker;
