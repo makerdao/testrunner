@@ -36,7 +36,7 @@ export default async (client, testchainId, options) => {
       [daiPlugin, { prefetch: true }],
       [configPlugin, { testchainId: testchainId, backendEnv: backendEnv }]
     ],
-    log: true,
+    log: false,
     url: options.rpcUrl,
     accounts
   };
