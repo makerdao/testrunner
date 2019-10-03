@@ -10,7 +10,7 @@ let testchainId;
 let testchainDetails;
 
 beforeAll(async () => {
-  jest.setTimeout(60000);
+  jest.setTimeout(30000);
   testchainClient = await createClient();
 });
 
