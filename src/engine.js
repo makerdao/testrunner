@@ -5,8 +5,14 @@ import createClient from './testchain';
 import assert from 'assert';
 import shuffle from 'lodash/shuffle';
 import Maker from '@makerdao/dai';
-import McdPlugin from '@makerdao/dai-plugin-mcd';
-import { ETH, REP, ZRX, OMG, BAT, DGD } from '@makerdao/dai-plugin-mcd';
+import McdPlugin, {
+  ETH,
+  REP,
+  ZRX,
+  OMG,
+  BAT,
+  DGD
+} from '@makerdao/dai-plugin-mcd';
 import debug from 'debug';
 const log = debug('testrunner:engine');
 
