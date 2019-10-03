@@ -11,7 +11,8 @@ import McdPlugin, {
   ZRX,
   OMG,
   BAT,
-  DGD
+  DGD,
+  MDAI
 } from '@makerdao/dai-plugin-mcd';
 import debug from 'debug';
 const log = debug('testrunner:engine');
@@ -30,7 +31,8 @@ export default class Engine {
       ZRX,
       OMG,
       BAT,
-      DGD
+      DGD,
+      MDAI
     };
   }
 
