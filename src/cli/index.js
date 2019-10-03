@@ -5,7 +5,10 @@ args
   .option('-k, --keystore <dir>', 'keystore for defaultAccount (ETH_KEYSTORE)')
   .option('--password', 'key password (ETH_PASSWORD)')
   .option('-p, --plan <name>', 'plan name')
-  .option('-r, --rpc-accounts', 'use RPC accounts instead of keystore (ETH_RPC_ACCOUNTS)')
+  .option(
+    '-r, --rpc-accounts',
+    'use RPC accounts instead of keystore (ETH_RPC_ACCOUNTS)'
+  )
   .option('-u, --url <url>', 'RPC url');
 
 args.parse(process.argv);
