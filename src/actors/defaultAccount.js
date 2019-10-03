@@ -6,22 +6,38 @@ import debug from 'debug';
 const log = debug('testrunner:defaultAccount');
 
 export default async function(name, maker, options) {
-  let address = options.address || process.env.ETH_FROM;
-  assert(address, '--address or ETH_FROM must be set to use defaultAccount');
-  if (!address.startsWith('0x')) address = '0x' + address;
+  assert(maker, 'defaultAccount needs a maker instance');
+  const useRpcAccounts = process.env.ETH_RPC_ACCOUNTS || options.rpcAccounts;
 
-  let privateKey;
-  if (!process.env.ETH_RPC_ACCOUNTS && !options.rpcAccounts) {
+  let address = options.address || process.env.ETH_FROM;
+  if (address && !address.startsWith('0x')) address = '0x' + address;
+
+  if (useRpcAccounts) {
+    const existingAccounts = maker.listAccounts();
+    if (
+      !existingAccounts.find(
+        a =>
+          a.type === 'provider' &&
+          (a.address === address || (!address && a.name === 'default'))
+      )
+    ) {
+      await maker.addAccount({ type: 'provider', address });
+    }
+  } else {
+    assert(
+      address,
+      'address must be set to use defaultAccount without rpcAccounts'
+    );
     const keystore = options.keystore || process.env.ETH_KEYSTORE;
     const password = options.password || process.env.ETH_PASSWORD || '';
-    privateKey = findKeyFromStore(address, keystore, password);
+    const key = findKeyFromStore(address, keystore, password);
+    const data = await maker.addAccount({ type: 'privateKey', key });
+    assert(
+      data.address === address,
+      `address mismatch: ${address}, ${data.address}`
+    );
   }
-  assert(maker, 'defaultAccount needs a maker instance');
-  const data = await maker.addAccount({ type: 'privateKey', key: privateKey });
-  assert(
-    data.address === address,
-    `address mismatch: ${address}, ${data.address}`
-  );
+
   return { address };
 }
 
