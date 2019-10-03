@@ -851,10 +851,10 @@
     babel-runtime "^6.26.0"
     ramda "^0.26.1"
 
-"@makerdao/dai-plugin-mcd@^0.2.14-rc.1":
-  version "0.2.14-rc.1"
-  resolved "https://registry.yarnpkg.com/@makerdao/dai-plugin-mcd/-/dai-plugin-mcd-0.2.14-rc.1.tgz#204d9afa241cca4127eb3b69af4302001bd3b0bf"
-  integrity sha512-uL6sScVwUtokqziJcvzl1W6fjXGUioP0i1YtGSTGz+/SW/gY+R8Rz9PqL5mG3kmDRoZdYriOAWEZvtCdUIeH1g==
+"@makerdao/dai-plugin-mcd@^0.2.14":
+  version "0.2.14"
+  resolved "https://registry.yarnpkg.com/@makerdao/dai-plugin-mcd/-/dai-plugin-mcd-0.2.14.tgz#72b80eac9ffe855aed41fcc830d0ee978ca5cd1b"
+  integrity sha512-k3lp9rZJmG5y1KbHtjXVOc2S5QkXGrti0iBfdCXzW7y+Ur4pEEyzW/J+gDtON3bnTtosW0F9S4f1uh4kGXayRQ==
   dependencies:
     "@makerdao/currency" "^0.9.5"
     "@makerdao/services-core" "^0.9.9"
@@ -3510,7 +3510,7 @@ ethers@^3.0.15:
     uuid "2.0.1"
     xmlhttprequest "1.8.0"
 
-ethers@^4.0.6:
+ethers@^4.0.37, ethers@^4.0.6:
   version "4.0.37"
   resolved "https://registry.yarnpkg.com/ethers/-/ethers-4.0.37.tgz#dfa70d59498663878c5e4a977d14356660ca5b90"
   integrity sha512-B7bDdyQ45A5lPr6k2HOkEKMtYOuqlfy+nNf8glnRvWidkDQnToKw1bv7UyrwlbsIgY2mE03UxTVtouXcT6Vvcw==

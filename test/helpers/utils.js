@@ -4,6 +4,7 @@ import { createCurrencyRatio } from '@makerdao/currency';
 import ethAbi from 'web3-eth-abi';
 import assert from 'assert';
 import BigNumber from 'bignumber.js';
+import { utils as ethersUtils } from 'ethers';
 
 const RAY = new BigNumber('1e27');
 
@@ -35,8 +36,8 @@ export async function setupCollateral(maker, ilk, options = {}) {
     );
 }
 
-export function createMaker(url) {
-  return Maker.create('http', {
+export async function createMaker(url) {
+  return await Maker.create('http', {
     url,
     plugins: [[McdPlugin, { network: 'testnet', prefetch: false }]],
     log: false
@@ -50,6 +51,7 @@ async function setPrice(maker, ratio, ilk) {
 
   // using uint here instead of bytes32 so it gets left-padded
   const val = ethAbi.encodeParameter('uint', ratio.toFixed('wei'));
+
   await pip.poke(val);
   await scs.getContract('MCD_SPOT').poke(stringToBytes(ilk));
 
@@ -84,4 +86,13 @@ async function mint(maker, amount) {
   await token._contract['mint(uint256)'](amount.toFixed('wei'));
   const endBalance = await token.balance();
   expect(endBalance.minus(startBalance)).toEqual(amount);
+}
+
+export function stringToBytes32(text, pad = true) {
+  var data = ethersUtils.toUtf8Bytes(text);
+  if (data.length > 32) {
+    throw new Error('too long');
+  }
+  if (pad) data = ethersUtils.padZeros(data, 32);
+  return ethersUtils.hexlify(data);
 }
