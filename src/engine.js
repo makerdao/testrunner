@@ -66,18 +66,21 @@ export default class Engine {
 
     log('running actions...');
     for (const action of actions) {
-      if (report.success) {
-        const importedAction = ACTIONS[action[1]];
-        assert(importedAction, `Could not import action: ${action[1]}`);
-        const importedActor = actors[action[0]];
+      if (!report.success) break;
 
-        try {
-          const result = await this._runAction(importedAction, importedActor);
-          report.results.push(result);
-          report.completed.push(action);
-        } catch (error) {
-          return failAtIndex(report.results.length, error);
-        }
+      const [actorName, actionName] = action;
+      try {
+        const importedAction = ACTIONS[actionName];
+        assert(importedAction, `Could not import action: ${actionName}`);
+
+        const importedActor = actors[actorName];
+        assert(importedActor, `Missing actor: ${actorName}`);
+
+        const result = await this._runAction(importedAction, importedActor);
+        report.results.push(result);
+        report.completed.push(action);
+      } catch (error) {
+        return failAtIndex(report.results.length, error);
       }
     }
 
