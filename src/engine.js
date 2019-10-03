@@ -104,7 +104,6 @@ export default class Engine {
   }
 
   async _runAction(action, actor) {
-    console.log(this._options);
     const { before, operation, after } = action;
     if (actor.address) this._maker.useAccountWithAddress(actor.address);
     if (before) await this._runStep(before.bind(action), actor);

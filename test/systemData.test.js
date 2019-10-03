@@ -11,5 +11,6 @@ test('can get basic system data to verify deployment', async () => {
   await maker.authenticate();
   await setupCollateral(maker, 'ETH-A', { price: 150, debtCeiling: 50 });
   const report = await engine.run();
-  console.log(report);
+  expect(report.results[0].debtCeiling).toBe(1000000);
+  expect(report.results[0].baseRate).toBe(0);
 });
