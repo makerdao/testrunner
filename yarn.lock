@@ -904,10 +904,10 @@
     lodash "^4.17.15"
     toposort "^2.0.2"
 
-"@makerdao/testchain-client@^0.2.14-rc.1":
-  version "0.2.14-rc.1"
-  resolved "https://registry.yarnpkg.com/@makerdao/testchain-client/-/testchain-client-0.2.14-rc.1.tgz#c353b88cedd71e86586366d2a8fd131c6c960490"
-  integrity sha512-kLZiEL96WEnuUTXeu38YYymc7yxg6O7aSjrZUksNYyb6ewv4wv0kZ+PrfwTPj0iD6bX63vuS/c+0YW1UV6iY/Q==
+"@makerdao/testchain-client@^0.2.14":
+  version "0.2.14"
+  resolved "https://registry.yarnpkg.com/@makerdao/testchain-client/-/testchain-client-0.2.14.tgz#25d680ca009d91c7d99a76d06d324616a0d50583"
+  integrity sha512-CpMj9D0IcnktQg1l2iTTIZcQ0V+i+Kl3vjIqvfyVvrEg18g1gqD3alzAwVJj49rHo5JKLrEnISs9NdMgTt5y9A==
   dependencies:
     babel-runtime "^6.26.0"
     debug "^4.1.1"
