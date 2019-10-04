@@ -11,7 +11,8 @@ import McdPlugin, {
   ZRX,
   OMG,
   BAT,
-  DGD
+  DGD,
+  MDAI
 } from '@makerdao/dai-plugin-mcd';
 import debug from 'debug';
 const log = debug('testrunner:engine');
@@ -30,7 +31,8 @@ export default class Engine {
       ZRX,
       OMG,
       BAT,
-      DGD
+      DGD,
+      MDAI
     };
   }
 
@@ -104,7 +106,7 @@ export default class Engine {
   }
 
   async _runAction(action, actor) {
-    console.log(this._options);
+    // console.log(this._options);
     const { before, operation, after } = action;
     if (actor.address) this._maker.useAccountWithAddress(actor.address);
     if (before) await this._runStep(before.bind(action), actor);
