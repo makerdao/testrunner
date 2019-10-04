@@ -1,9 +1,11 @@
 import ACTORS from './actors';
 import ACTIONS from './actions';
 import PLANS from './plans';
+import ALERTERS from './alerters';
 import createClient from './testchain';
 import assert from 'assert';
 import shuffle from 'lodash/shuffle';
+import castArray from 'lodash/castArray';
 import Maker from '@makerdao/dai';
 import McdPlugin from '@makerdao/dai-plugin-mcd';
 import debug from 'debug';
@@ -24,7 +26,11 @@ export default class Engine {
 
     // TODO set this based on whether the plans/actions require a testchain
     const shouldUseTestchainClient = false;
-    const report = { results: [], success: true, completed: [] };
+    const report = (this.report = {
+      results: [],
+      success: true,
+      completed: []
+    });
     const failAtIndex = (index, error) => {
       report.success = false;
       report.error = error;
@@ -85,6 +91,19 @@ export default class Engine {
     }
 
     return report;
+  }
+
+  // `level` is similar to log levels -- e.g. if the level is "error", an
+  // alerter should not produce any output unless there's an error
+  async alert(level, alerters) {
+    assert(this.report, 'Nothing to alert on yet');
+
+    alerters = castArray(alerters);
+    for (const name of alerters) {
+      const factory = ALERTERS[name];
+      assert(factory, `Unrecognized alerter name: ${name}`);
+      await factory()(level, this.report);
+    }
   }
 
   async stop() {
