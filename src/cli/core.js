@@ -11,8 +11,7 @@ export default async function(options) {
   const engine = new Engine(options);
   await engine.run();
 
-  // TODO allow changing alert level & alerters with CLI args
-  await engine.alert('info', 'console');
+  await engine.alert(options.alertLevel, options.alert);
   await engine.stop();
   process.exit(engine.report.success ? 0 : 1);
 }
