@@ -5,7 +5,15 @@ import createClient from './testchain';
 import assert from 'assert';
 import shuffle from 'lodash/shuffle';
 import Maker from '@makerdao/dai';
-import McdPlugin from '@makerdao/dai-plugin-mcd';
+import McdPlugin, {
+  ETH,
+  REP,
+  ZRX,
+  OMG,
+  BAT,
+  DGD,
+  MDAI
+} from '@makerdao/dai-plugin-mcd';
 import debug from 'debug';
 const log = debug('testrunner:engine');
 
@@ -17,6 +25,15 @@ export default class Engine {
       'Must provide { plans } OR { actors, actions }, but not both'
     );
     this._options = options;
+    this._currencies = {
+      ETH,
+      REP,
+      ZRX,
+      OMG,
+      BAT,
+      DGD,
+      MDAI
+    };
   }
 
   async run() {
@@ -105,7 +122,7 @@ export default class Engine {
       step.length < 2 || this._maker,
       'Action requires Maker instance but none exists'
     );
-    return step(actor, this._maker);
+    return step(actor, this._maker, this._currencies);
   }
 
   async _importActors(actors) {

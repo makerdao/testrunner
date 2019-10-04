@@ -30,6 +30,7 @@ test('createTestchain returns a connected testchain', async () => {
 });
 
 test('createMaker returns a connected maker instance with accounts', async () => {
+  jest.setTimeout(10000);
   const maker = await createMaker(
     testchainClient,
     testchainId,
