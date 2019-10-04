@@ -10,11 +10,17 @@ export default async function main(options) {
     };
 
     const engine = new Engine(options);
-    await engine.run();
+    const { success } = await engine.run();
+    await engine.stop();
+    if (!success) console.log('Plan run did not succeed.');
 
     await engine.alert(options.alertLevel, options.alert);
-    await engine.stop();
-    process.exit(engine.report.success ? 0 : 1);
+
+    // this might need to change, in order to distinguish between plan run
+    // failures and errors in the testrunner itself; perhaps we should only
+    // return a non-zero exit status in the latter case, and rely upon reporter
+    // output for the former
+    process.exit(success ? 0 : 1);
   } catch (error) {
     const output = options.verbose || !error.message ? error : error.message;
     console.error(output);

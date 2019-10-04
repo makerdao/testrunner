@@ -30,14 +30,23 @@ async function post(message) {
   }
 }
 
+function format(report) {
+  if (!report.success) {
+    const { message, name } = report.error;
+    if (name.startsWith('AssertionError')) {
+      report.error = { message };
+    }
+  }
+  return '```' + JSON.stringify(report, null, '  ') + '```';
+}
+
 async function alerter(level, report) {
-  const formattedReport = '```' + JSON.stringify(report, null, '  ') + '```';
   switch (level) {
     case 'info':
-      return post(formattedReport);
+      return post(format(report));
     case 'error':
       if (!report.success) {
-        return post(formattedReport);
+        return post(format(report));
       } else {
         console.log('Run succeeded; sending no alert.');
       }

@@ -26,7 +26,7 @@ export default async function(name, maker, options) {
   } else {
     assert(
       address,
-      'address must be set to use defaultAccount without rpcAccounts'
+      'to use defaultAccount, address or rpcAccounts must be set'
     );
     const keystore = options.keystore || process.env.ETH_KEYSTORE;
     const password = options.password || process.env.ETH_PASSWORD || '';

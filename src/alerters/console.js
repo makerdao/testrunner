@@ -1,10 +1,27 @@
+import omit from 'lodash/omit';
+
+function print(report) {
+  if (report.success) {
+    console.log(report);
+    return;
+  }
+
+  console.log(omit(report, 'error'));
+  console.error(
+    report.error.stack
+      .split('\n')
+      .slice(0, 5)
+      .join('\n')
+  );
+}
+
 function alerter(level, report) {
   switch (level) {
     case 'info':
-      console.log(report);
+      print(report);
       break;
     case 'error':
-      if (!report.success) console.log(report);
+      if (!report.success) print(report);
       break;
   }
 }
