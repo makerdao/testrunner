@@ -11,7 +11,8 @@ args
     '-r, --rpc-accounts',
     'use RPC accounts instead of keystore (ETH_RPC_ACCOUNTS)'
   )
-  .option('-u, --url <url>', 'RPC url');
+  .option('-u, --url <url>', 'RPC url')
+  .option('--verbose', 'verbose output');
 
 args.parse(process.argv);
 
