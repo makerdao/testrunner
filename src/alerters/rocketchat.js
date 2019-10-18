@@ -1,17 +1,20 @@
 import fetch from 'node-fetch';
 
-const API_PATH = 'https://chat.makerdao.com/api/v1/chat.postMessage';
-const channel = '#team-js-prod-dev-protected';
+let {
+  ROCKET_CHAT_USER_ID,
+  ROCKET_CHAT_AUTH_TOKEN,
+  ROCKET_CHAT_API_PATH = 'https://chat.makerdao.com/api/v1/chat.postMessage',
+  ROCKET_CHAT_CHANNEL = '#team-js-prod-dev-protected'
+} = process.env;
 
 async function post(message) {
-  console.log(`Posting to ${channel}...`);
-  const { ROCKET_CHAT_USER_ID, ROCKET_CHAT_AUTH_TOKEN } = process.env;
+  console.log(`Posting to ${ROCKET_CHAT_CHANNEL}...`);
   if (!ROCKET_CHAT_USER_ID || !ROCKET_CHAT_AUTH_TOKEN) {
     throw new Error(
       'Missing from environment: ROCKET_CHAT_USER_ID, ROCKET_CHAT_AUTH_TOKEN'
     );
   }
-  const res = await fetch(API_PATH, {
+  const res = await fetch(ROCKET_CHAT_API_PATH, {
     method: 'post',
     headers: {
       'X-Auth-Token': ROCKET_CHAT_AUTH_TOKEN,
@@ -19,8 +22,9 @@ async function post(message) {
     },
     body: JSON.stringify({
       text: message,
-      channel,
-      emoji: ':robot:'
+      channel: ROCKET_CHAT_CHANNEL,
+      emoji: ':robot:',
+      alias: 'testrunner'
     })
   });
   if (!res.ok) {
