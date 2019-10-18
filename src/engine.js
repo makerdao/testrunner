@@ -45,11 +45,13 @@ export default class Engine {
       // n.b. this means that Maker is only set up when url is explicitly set--
       // this is only temporary
       try {
+        log('setting up maker instance...');
         this._maker = await Maker.create('http', {
           url: this._options.url,
-          plugins: [[McdPlugin, { network: 'testnet', prefetch: false }]],
+          plugins: [[McdPlugin, { prefetch: false }]],
           log: false
         });
+        log('succeeded in setting up maker instance.');
       } catch (error) {
         return failAtIndex(-1, error);
       }

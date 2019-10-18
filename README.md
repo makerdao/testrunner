@@ -21,7 +21,7 @@ Options:
   -p, --plan <name>      plan name
   -r, --rpc-accounts     use RPC accounts instead of keystore (ETH_RPC_ACCOUNTS)
   -u, --url <url>        RPC url
-  --verbose              verbose output
+  -v, --verbose          verbose output
   -h, --help             output usage information
 ```
 
