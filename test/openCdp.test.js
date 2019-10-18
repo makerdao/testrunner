@@ -8,6 +8,7 @@ test('basic cdp functions', async () => {
   });
 
   const report = await engine.run();
+  expect(report.error).toBeFalsy();
   const cdp = report.results[0];
   expect(cdp.collateralValue.toNumber()).toEqual(150);
   expect(cdp.debtValue.toNumber()).toEqual(1);
