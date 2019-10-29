@@ -117,7 +117,7 @@ export default class Engine {
     if (actor.address) this._maker.useAccountWithAddress(actor.address);
     if (before) await this._runStep(before.bind(action), actor);
     const result = await this._runStep(operation.bind(action), actor);
-    if (after) await this._runStep(after.bind(action), actor);
+    if (after) await after(actor, this._maker, result);
     return result;
   }
 

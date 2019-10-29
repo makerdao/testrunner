@@ -86,6 +86,21 @@ test('when engine fails during operation, it stops immediately and updates repor
   expect(report.error.message).toEqual('failure in operation');
 });
 
+test('after gets return value from operation', async () => {
+  const engine = new Engine({
+    actors: { user1: 'selfTestUser' },
+    actions: [['user1', 'checkAfter']]
+  });
+  const report = await engine.run();
+  expect(report).toEqual({
+    success: false,
+    error: expect.objectContaining({ message: 'value is not 3' }),
+    errorIndex: 0,
+    results: [],
+    completed: []
+  });
+});
+
 test('when engine fails after, it stops immediately and updates report with error info', async () => {
   const engine = new Engine({
     actors: { user1: 'selfTestUser' },
