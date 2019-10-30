@@ -12,5 +12,6 @@ export default {
   after: (user, { lastResult }) => {
     assert(lastResult === 4, 'value is not 4');
     assert(lastResult === 3, 'value is not 3');
-  }
+  },
+  category: 'selfTest'
 };

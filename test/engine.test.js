@@ -1,6 +1,6 @@
 import Engine from '../src/engine';
 
-test('engine can run a simple plan', async () => {
+test('simple plan', async () => {
   const engine = new Engine({
     plans: ['selfTestA']
   });
@@ -13,7 +13,7 @@ test('engine can run a simple plan', async () => {
   });
 });
 
-test('engine can run multiple simple plans', async () => {
+test('multiple simple plans', async () => {
   const engine = new Engine({
     plans: ['selfTestA', 'selfTestB']
   });
@@ -30,7 +30,7 @@ test('engine can run multiple simple plans', async () => {
   });
 });
 
-test('engine can run an explicit series of actors and actions', async () => {
+test('explicit series of actors and actions', async () => {
   const engine = new Engine({
     actors: { user1: 'selfTestUser' },
     actions: [['user1', 'checkUser']]
@@ -44,7 +44,7 @@ test('engine can run an explicit series of actors and actions', async () => {
   });
 });
 
-test('when engine fails before, it stops immediately and updates report with error info', async () => {
+test('fail before', async () => {
   const engine = new Engine({
     actors: { user1: 'selfTestUser' },
     actions: [
@@ -65,7 +65,7 @@ test('when engine fails before, it stops immediately and updates report with err
   expect(report.error.message).toEqual('failure in before');
 });
 
-test('when engine fails during operation, it stops immediately and updates report with error info', async () => {
+test('fail during', async () => {
   const engine = new Engine({
     actors: { user1: 'selfTestUser' },
     actions: [
@@ -101,7 +101,7 @@ test("each step gets previous step's return value", async () => {
   });
 });
 
-test('when engine fails after, it stops immediately and updates report with error info', async () => {
+test('fail after', async () => {
   const engine = new Engine({
     actors: { user1: 'selfTestUser' },
     actions: [
@@ -122,7 +122,7 @@ test('when engine fails after, it stops immediately and updates report with erro
   expect(report.error.message).toEqual('failure in after');
 });
 
-test('engine can randomize nested actions', async () => {
+test('randomize nested actions', async () => {
   const actorsAndActions = {
     actors: {
       user1: 'selfTestUser',
@@ -162,7 +162,7 @@ test('engine can randomize nested actions', async () => {
   expect(report1).not.toEqual(report2);
 });
 
-test('engine can randomize nested actions from imported plans', async () => {
+test('randomize nested actions from imported plans', async () => {
   const engine = new Engine({ plans: ['selfTestC'] });
   const report1 = await engine.run();
   let report2 = await engine.run();
@@ -174,7 +174,7 @@ test('engine can randomize nested actions from imported plans', async () => {
   expect(report1).not.toEqual(report2);
 });
 
-test('engine can randomize all actions when plan mode is set to random', async () => {
+test('randomize all actions when plan mode is set to random', async () => {
   const engine = new Engine({ plans: ['selfTestD'] });
   const report1 = await engine.run();
   let report2 = await engine.run();
@@ -186,7 +186,7 @@ test('engine can randomize all actions when plan mode is set to random', async (
   expect(report1).not.toEqual(report2);
 });
 
-test('engine throws when given invalid plans, actions, or actors', async () => {
+test('throw when given invalid plans, actions, or actors', async () => {
   const invalidParams = [
     {},
     {
@@ -213,3 +213,19 @@ async function testRunError(params) {
     return err.message;
   }
 }
+
+test('context', async () => {
+  const engine = new Engine({
+    actors: {
+      user1: 'selfTestUser'
+    },
+    actions: [
+      ['user1', 'checkContext'],
+      ['user1', 'checkContext'],
+      ['user1', 'checkContext']
+    ]
+  });
+
+  const report = await engine.run();
+  expect(report.results).toEqual([3, 9, 15]);
+});

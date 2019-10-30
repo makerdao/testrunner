@@ -26,6 +26,10 @@ export default class Engine {
 
     // TODO set this based on whether the plans/actions require a testchain
     const shouldUseTestchainClient = false;
+
+    // use this to share state across all actions in a plan
+    this._context = {};
+
     const report = (this.report = {
       results: [],
       success: true,
@@ -131,7 +135,11 @@ export default class Engine {
   }
 
   _runStep(step, actor, lastResult) {
-    return step(actor, { maker: this._maker, lastResult });
+    return step(actor, {
+      maker: this._maker,
+      context: this._context,
+      lastResult
+    });
   }
 
   async _importActors(actors) {
