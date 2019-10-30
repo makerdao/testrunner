@@ -86,10 +86,10 @@ test('when engine fails during operation, it stops immediately and updates repor
   expect(report.error.message).toEqual('failure in operation');
 });
 
-test('after gets return value from operation', async () => {
+test("each step gets previous step's return value", async () => {
   const engine = new Engine({
     actors: { user1: 'selfTestUser' },
-    actions: [['user1', 'checkAfter']]
+    actions: [['user1', 'checkLastResult']]
   });
   const report = await engine.run();
   expect(report).toEqual({

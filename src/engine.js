@@ -115,18 +115,23 @@ export default class Engine {
   async _runAction(action, actor) {
     const { before, operation, after } = action;
     if (actor.address) this._maker.useAccountWithAddress(actor.address);
-    if (before) await this._runStep(before.bind(action), actor);
-    const result = await this._runStep(operation.bind(action), actor);
-    if (after) await after(actor, this._maker, result);
+
+    const beforeResult = before
+      ? await this._runStep(before.bind(action), actor)
+      : undefined;
+
+    const result = await this._runStep(
+      operation.bind(action),
+      actor,
+      beforeResult
+    );
+
+    if (after) await this._runStep(after.bind(action), actor, result);
     return result;
   }
 
-  _runStep(step, actor) {
-    assert(
-      step.length < 2 || this._maker,
-      'Action requires Maker instance but none exists'
-    );
-    return step(actor, this._maker);
+  _runStep(step, actor, lastResult) {
+    return step(actor, { maker: this._maker, lastResult });
   }
 
   async _importActors(actors) {
