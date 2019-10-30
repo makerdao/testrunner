@@ -1,4 +1,4 @@
-import { stringToBytes } from '../../test/helpers/utils';
+import { stringToBytes } from './helpers/utils';
 export const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 export default {

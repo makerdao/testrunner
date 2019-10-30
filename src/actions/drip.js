@@ -1,4 +1,4 @@
-import { stringToBytes } from '../../test/helpers/utils';
+import { stringToBytes } from './helpers/utils';
 
 export default {
   // before and after can be omitted, but remain
