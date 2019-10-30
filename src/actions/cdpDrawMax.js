@@ -9,7 +9,7 @@ export default {
     let cdp = await manager.getCdp(cdpIds[0].id, { cache: false });
     cdp.reset();
     await cdp.prefetch();
-    let amount = cdp.isSafe ? cdp.daiAvailable._amount - 0.000001 : 0;
+    let amount = cdp.isSafe ? cdp.daiAvailable._amount - 0.00001 : 0;
     amount = amount < 0 ? 0 : amount;
 
     await maker
