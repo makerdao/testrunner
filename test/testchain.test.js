@@ -25,7 +25,6 @@ test('createTestchain returns a connected testchain', async () => {
   testchainId = await createTestchain(testchainClient);
   await sleep(15000);
   testchainDetails = await setTestchainDetails(testchainClient, testchainId);
-  console.log('testchain details', testchainDetails);
   const networks = await testchainClient.api.listAllChains();
   expect(networks.data[0].id).toBeDefined();
 });
