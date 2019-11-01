@@ -25,11 +25,12 @@ test('createTestchain returns a connected testchain', async () => {
   testchainId = await createTestchain(testchainClient);
   await sleep(15000);
   testchainDetails = await setTestchainDetails(testchainClient, testchainId);
+  console.log('testchain details', testchainDetails);
   const networks = await testchainClient.api.listAllChains();
   expect(networks.data[0].id).toBeDefined();
 });
 
-xtest('createMaker returns a connected maker instance with accounts', async () => {
+test('createMaker returns a connected maker instance with accounts', async () => {
   jest.setTimeout(10000);
   const maker = await createMaker(
     testchainClient,

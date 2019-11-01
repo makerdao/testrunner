@@ -7,7 +7,7 @@ import { asyncForEach, sleep } from '../test/helpers/utils';
 // const websocketUrl = process.env.websocketUrl || 'ws://127.1:4000/socket';
 
 const backendEnv = 'prod';
-const defaultSnapshotId = '13978968591367274503';
+const defaultSnapshotId = '12911430008968214647';
 const testchainUrl = 'http://18.185.172.121:4000';
 const websocketUrl = 'ws://18.185.172.121:4000/socket';
 
