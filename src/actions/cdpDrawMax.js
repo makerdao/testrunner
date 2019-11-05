@@ -3,21 +3,36 @@ export default {
   before: () => {},
   operation: async (user, { maker }) => {
     const manager = maker.service('mcd:cdpManager');
+    const managerAddress = manager
+      .get('smartContract')
+      .getContractAddress('CDP_MANAGER');
     const proxy = await maker.service('proxy').getProxyAddress();
     const cdpIds = await maker.service('mcd:cdpManager').getCdpIds(proxy, true);
 
-    let cdp = await manager.getCdp(cdpIds[0].id, { cache: false });
+    const cdp = await manager.getCdp(cdpIds[0].id);
     cdp.reset();
+    cdp.type.reset();
     await cdp.prefetch();
-    let amount = cdp.isSafe ? cdp.daiAvailable._amount - 0.00001 : 0;
-    amount = amount < 0 ? 0 : amount;
 
-    await maker
-      .service('mcd:cdpManager')
-      .lockAndDraw(cdp.id, cdp.ilk, ETH(0), MDAI(amount));
+    const ilkInfo = await cdp.type.ilkInfo();
+    const amount = cdp.isSafe
+      ? cdp.daiAvailable.shiftedBy(27).div(ilkInfo.rate)
+      : MDAI(0);
 
-    await cdp.prefetch();
-    return cdp;
+    //Use frob directly to avoid a drip()
+    const method = 'frob';
+    const args = [
+      managerAddress,
+      cdp.id,
+      ETH(0).toFixed('wei'),
+      amount.toFixed('wei'),
+      {
+        dsProxy: true,
+        value: 0
+      }
+    ].filter(x => x);
+
+    await manager.proxyActions[method](...args);
   },
   after: () => {},
   category: 'cdp'
