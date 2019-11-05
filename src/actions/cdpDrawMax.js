@@ -1,7 +1,7 @@
 import { ETH, MDAI } from '@makerdao/dai-plugin-mcd';
 export default {
   before: () => {},
-  operation: async (user, maker) => {
+  operation: async (user, { maker }) => {
     const manager = maker.service('mcd:cdpManager');
     const proxy = await maker.service('proxy').getProxyAddress();
     const cdpIds = await maker.service('mcd:cdpManager').getCdpIds(proxy, true);

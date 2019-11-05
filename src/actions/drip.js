@@ -4,7 +4,7 @@ export default {
   // before and after can be omitted, but remain
   // here as an example
   before: () => {},
-  operation: async (user, maker) => {
+  operation: async (user, { maker }) => {
     return maker
       .service('smartContract')
       .getContract('MCD_JUG')
