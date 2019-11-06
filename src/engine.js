@@ -166,16 +166,18 @@ export default class Engine {
   async _importActors(actors) {
     const result = {};
     for (let name of Object.keys(actors)) {
-      assert(
-        ACTORS[actors[name]],
-        `Could not import actor: { ${name}: ${actors[name]} }`
-      );
-      result[name] = await ACTORS[actors[name]](
-        name,
-        this._maker,
-        this._options
-      );
-      log(`imported actor: ${name}`);
+      if (name !== undefined) {
+        assert(
+          ACTORS[actors[name]],
+          `Could not import actor: { ${name}: ${actors[name]} }`
+        );
+        result[name] = await ACTORS[actors[name]](
+          name,
+          this._maker,
+          this._options
+        );
+        log(`imported actor: ${name}`);
+      }
     }
     return result;
   }
@@ -188,7 +190,7 @@ export default class Engine {
         result.actors = { ...result.actors, ...importedPlan.actors };
         const actions =
           importedPlan.mode === 'random'
-            ? shuffle(importedPlan.actions)
+            ? this._randomAction(importedPlan.actions)
             : importedPlan.actions;
         result.actions = result.actions.concat(actions);
         return result;
