@@ -80,12 +80,12 @@ export default class Engine {
     log('running actions...');
     for (const action of actions) {
       if (!report.success) break;
-
-      const [actorName, actionName] = action;
+      let [actorName, actionName] = action;
       try {
         const importedAction = ACTIONS[actionName];
         assert(importedAction, `Could not import action: ${actionName}`);
 
+        if (!actorName) actorName = Object.keys(actors)[0];
         const importedActor = actors[actorName];
         assert(importedActor, `Missing actor: ${actorName}`);
 
@@ -145,19 +145,14 @@ export default class Engine {
 
   async _importActors(actors) {
     const result = {};
+
     for (let name of Object.keys(actors)) {
-      if (name !== undefined) {
-        assert(
-          ACTORS[actors[name]],
-          `Could not import actor: { ${name}: ${actors[name]} }`
-        );
-        result[name] = await ACTORS[actors[name]](
-          name,
-          this._maker,
-          this._options
-        );
-        log(`imported actor: ${name}`);
-      }
+      const actor = Array.isArray(actors[name])
+        ? actors[name][0]
+        : actors[name];
+      assert(ACTORS[actor], `Could not import actor: { ${name}: ${actor} }`);
+      result[name] = await ACTORS[actor](name, this._maker, this._options);
+      log(`imported actor: ${name}`);
     }
     return result;
   }
@@ -167,17 +162,49 @@ export default class Engine {
       (result, plan) => {
         const importedPlan = PLANS[plan];
         assert(importedPlan, `Could not import plan: ${plan}`);
-        result.actors = { ...result.actors, ...importedPlan.actors };
 
-        const actions =
-          importedPlan.mode === 'random'
-            ? this._randomAction(importedPlan.actions)
-            : importedPlan.actions;
-        result.actions = result.actions.concat(actions);
+        if (importedPlan.mode === 'random') {
+          const randomActor = this._randomActor({ ...importedPlan.actors });
+          result.actors = { ...result.actors, ...randomActor };
+          let actions = importedPlan.actions;
+          actions.forEach((action, index) => {
+            if (typeof action[0] === 'object') {
+              actions.splice(
+                index,
+                1,
+                ...this._randomAction(action).map(act => [
+                  Object.keys(randomActor)[0],
+                  act[1],
+                  act[2]
+                ])
+              );
+            }
+          });
+          actions = this._randomAction(importedPlan.actions).map(action => [
+            Object.keys(randomActor)[0],
+            action[1],
+            action[2]
+          ]);
+          result.actions = result.actions.concat(actions);
+        } else {
+          result.actors = { ...result.actors, ...importedPlan.actors };
+          result.actions = result.actions.concat(importedPlan.actions);
+        }
         return result;
       },
       { actors: {}, actions: [] }
     );
+  }
+
+  _randomActor(actors) {
+    const actor = RandomWeights.chooseWeightedObject(
+      Object.keys(actors).map(actorName => ({
+        name: actorName,
+        a: actors[actorName],
+        weight: actors[actorName][1] || 1
+      }))
+    );
+    return { [actor.name]: actor.a };
   }
 
   _randomAction(actions) {

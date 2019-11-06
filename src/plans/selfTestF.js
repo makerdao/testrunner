@@ -1,6 +1,6 @@
 export default {
   actors: {
-    user1: 'selfTestUser',
+    user1: ['selfTestUser', 10],
     user2: 'selfTestUser',
     user3: 'selfTestUser',
     user4: 'selfTestUser',
@@ -12,16 +12,16 @@ export default {
     user10: 'selfTestUser'
   },
   actions: [
-    ['user1', 'checkUser', 45],
-    ['user2', 'checkUser', 70],
-    ['user3', 'checkUser', 10],
-    ['user4', 'checkUser', 50],
-    ['user5', 'checkUser', 20],
-    ['user6', 'checkUser', 1],
-    ['user7', 'checkUser', 55],
-    ['user8', 'checkUser', 72],
-    ['user9', 'checkUser', 45],
-    ['user10', 'checkUser', 8]
+    [undefined, 'checkUser', 45],
+    [undefined, 'checkUser', 70],
+    [undefined, 'checkUser', 10],
+    [undefined, 'checkUser', 50],
+    [undefined, 'checkUser', 20],
+    [undefined, 'checkUser', 1],
+    [undefined, 'checkUser', 55],
+    [undefined, 'checkUser', 72],
+    [undefined, 'checkUser', 45],
+    [undefined, 'checkUser', 8]
   ],
   mode: 'random'
 };

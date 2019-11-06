@@ -188,7 +188,7 @@ test('randomize all actions when plan mode is set to random', async () => {
   expect(report1.completed.length).toEqual(10);
 });
 
-test('pick a random action in a nested action', async () => {
+test('pick a random action in a nested action in random mode', async () => {
   const engine = new Engine({ plans: ['selfTestE'] });
   const report1 = await engine.run();
   let report2 = await engine.run();
