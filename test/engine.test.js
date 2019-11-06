@@ -172,6 +172,7 @@ test('randomize nested actions from imported plans', async () => {
   }
 
   expect(report1).not.toEqual(report2);
+  expect(report1.completed.length).toEqual(10);
 });
 
 test('randomize all actions when plan mode is set to random', async () => {
@@ -184,6 +185,33 @@ test('randomize all actions when plan mode is set to random', async () => {
   }
 
   expect(report1).not.toEqual(report2);
+  expect(report1.completed.length).toEqual(10);
+});
+
+test('pick a random action in a nested action', async () => {
+  const engine = new Engine({ plans: ['selfTestE'] });
+  const report1 = await engine.run();
+  let report2 = await engine.run();
+
+  if (report1 === report2) {
+    report2 = await engine.run();
+  }
+
+  expect(report1).not.toEqual(report2);
+  expect(report1.completed.length).toEqual(4);
+});
+
+test('pick a random action based on a weight and skip the others', async () => {
+  const engine = new Engine({ plans: ['selfTestF'] });
+  const report1 = await engine.run();
+  let report2 = await engine.run();
+
+  if (report1 === report2) {
+    report2 = await engine.run();
+  }
+
+  expect(report1).not.toEqual(report2);
+  expect(report1.completed.length).toEqual(1);
 });
 
 test('throw when given invalid plans, actions, or actors', async () => {

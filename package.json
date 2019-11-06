@@ -21,7 +21,8 @@
     "jest": "^24.9.0",
     "lodash": "^4.17.15",
     "web3-eth-abi": "^1.2.1",
-    "ws": "^7.1.2"
+    "ws": "^7.1.2",
+    "random-seed-weighted-chooser": "^1.0.14"
   },
   "devDependencies": {
     "@makerdao/testchain": "^0.2.15-1",

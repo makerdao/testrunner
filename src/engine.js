@@ -9,6 +9,7 @@ import castArray from 'lodash/castArray';
 import Maker from '@makerdao/dai';
 import McdPlugin from '@makerdao/dai-plugin-mcd';
 import debug from 'debug';
+import RandomWeights from 'random-seed-weighted-chooser';
 const log = debug('testrunner:engine');
 
 export default class Engine {
@@ -145,16 +146,18 @@ export default class Engine {
   async _importActors(actors) {
     const result = {};
     for (let name of Object.keys(actors)) {
-      assert(
-        ACTORS[actors[name]],
-        `Could not import actor: { ${name}: ${actors[name]} }`
-      );
-      result[name] = await ACTORS[actors[name]](
-        name,
-        this._maker,
-        this._options
-      );
-      log(`imported actor: ${name}`);
+      if (name !== undefined) {
+        assert(
+          ACTORS[actors[name]],
+          `Could not import actor: { ${name}: ${actors[name]} }`
+        );
+        result[name] = await ACTORS[actors[name]](
+          name,
+          this._maker,
+          this._options
+        );
+        log(`imported actor: ${name}`);
+      }
     }
     return result;
   }
@@ -168,7 +171,7 @@ export default class Engine {
 
         const actions =
           importedPlan.mode === 'random'
-            ? shuffle(importedPlan.actions)
+            ? this._randomAction(importedPlan.actions)
             : importedPlan.actions;
         result.actions = result.actions.concat(actions);
         return result;
@@ -177,11 +180,22 @@ export default class Engine {
     );
   }
 
+  _randomAction(actions) {
+    if (actions[0][2] !== undefined) {
+      return [
+        RandomWeights.chooseWeightedObject(
+          actions.map(action => ({ a: action, weight: action[2] }))
+        ).a
+      ];
+    }
+    return shuffle(actions);
+  }
+
   _randomActionCheck(actions) {
     const orderedActions = [...actions];
     orderedActions.forEach((action, index) => {
       if (typeof action[0] === 'object') {
-        orderedActions.splice(index, 1, ...shuffle(action));
+        orderedActions.splice(index, 1, ...this._randomAction(action));
       }
     });
     return orderedActions;
