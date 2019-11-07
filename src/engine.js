@@ -9,6 +9,8 @@ import castArray from 'lodash/castArray';
 import Maker from '@makerdao/dai';
 import McdPlugin from '@makerdao/dai-plugin-mcd';
 import debug from 'debug';
+import fs from 'fs';
+import path from 'path';
 const log = debug('testrunner:engine');
 
 export default class Engine {
@@ -18,6 +20,15 @@ export default class Engine {
       plans || (actors && actions),
       'Must provide { plans } OR { actors, actions }, but not both'
     );
+
+    if (options.addressesConfg) {
+      options.addressesConfg = path.resolve(options.addressesConfg);
+      assert(
+        fs.existsSync(options.addressesConfg),
+        'Addresses config file must exist !'
+      );
+    }
+
     this._options = options;
   }
 
@@ -49,11 +60,16 @@ export default class Engine {
       // n.b. this means that Maker is only set up when url is explicitly set--
       // this is only temporary
       try {
+        const addresses = require(this._options.addressesConfg);
+
         log('setting up maker instance...');
         this._maker = await Maker.create('http', {
           url: this._options.url,
           plugins: [[McdPlugin, { prefetch: false }]],
-          log: false
+          log: false,
+          smartContract: {
+            addressOverrides: addresses
+          }
         });
         log('succeeded in setting up maker instance.');
       } catch (error) {

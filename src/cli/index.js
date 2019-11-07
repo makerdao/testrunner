@@ -4,6 +4,7 @@ args
   .option('--alert <type>', 'alerter type [console, rocketchat]', 'console')
   .option('--alert-level <level>', 'alert level [info, error]', 'info')
   .option('-c, --config <file>', 'config file name')
+  .option('--addresses-confg <file>', 'addresses.json config file')
   .option('-k, --keystore <dir>', 'keystore for defaultAccount (ETH_KEYSTORE)')
   .option('--password', 'key password (ETH_PASSWORD)')
   .option('-p, --plan <name>', 'plan name')
