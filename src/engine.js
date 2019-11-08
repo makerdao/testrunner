@@ -21,11 +21,11 @@ export default class Engine {
       'Must provide { plans } OR { actors, actions }, but not both'
     );
 
-    if (options.addressesConfg) {
-      options.addressesConfg = path.resolve(options.addressesConfg);
+    if (options.addressesConfig) {
+      options.addressesConfig = path.resolve(options.addressesConfig);
       assert(
-        fs.existsSync(options.addressesConfg),
-        'Addresses config file must exist !'
+        fs.existsSync(options.addressesConfig),
+        'Addresses config file must exist'
       );
     }
 
