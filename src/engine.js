@@ -10,6 +10,8 @@ import Maker from '@makerdao/dai';
 import McdPlugin from '@makerdao/dai-plugin-mcd';
 import debug from 'debug';
 import RandomWeights from 'random-seed-weighted-chooser';
+import fs from 'fs';
+import path from 'path';
 const log = debug('testrunner:engine');
 
 export default class Engine {
@@ -19,6 +21,16 @@ export default class Engine {
       plans || (actors && actions),
       'Must provide { plans } OR { actors, actions }, but not both'
     );
+
+    if (options.addressesConfig) {
+      options.addressesConfig = path.resolve(options.addressesConfig);
+      assert(
+        fs.existsSync(options.addressesConfig),
+        'Addresses config file must exist'
+      );
+      this._addressesConfig = require(options.addressesConfig);
+    }
+
     this._options = options;
   }
 
@@ -54,7 +66,10 @@ export default class Engine {
         this._maker = await Maker.create('http', {
           url: this._options.url,
           plugins: [[McdPlugin, { prefetch: false }]],
-          log: false
+          log: false,
+          smartContract: {
+            addressOverrides: this._addressesConfig
+          }
         });
         log('succeeded in setting up maker instance.');
       } catch (error) {

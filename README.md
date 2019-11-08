@@ -12,17 +12,18 @@ $ node ./src/cli -h
 Usage: cli [options]
 
 Options:
-  -a, --address <hex>    address for defaultAccount (ETH_FROM)
-  --alert <type>         alerter type [console, rocketchat] (default: "console")
-  --alert-level <level>  alert level [info, error] (default: "info")
-  -c, --config <file>    config file name
-  -k, --keystore <dir>   keystore for defaultAccount (ETH_KEYSTORE)
-  --password             key password (ETH_PASSWORD)
-  -p, --plan <name>      plan name
-  -r, --rpc-accounts     use RPC accounts instead of keystore (ETH_RPC_ACCOUNTS)
-  -u, --url <url>        RPC url
-  -v, --verbose          verbose output
-  -h, --help             output usage information
+  -a, --address <hex>        address for defaultAccount (ETH_FROM)
+  --addresses-config <file>  addresses.json config file
+  --alert <type>             alerter type [console, rocketchat] (default: "console")
+  --alert-level <level>      alert level [info, error] (default: "info")
+  -c, --config <file>        config file name
+  -k, --keystore <dir>       keystore for defaultAccount (ETH_KEYSTORE)
+  --password                 key password (ETH_PASSWORD)
+  -p, --plan <name>          plan name
+  -r, --rpc-accounts         use RPC accounts instead of keystore (ETH_RPC_ACCOUNTS)
+  -u, --url <url>            RPC url
+  -v, --verbose              verbose output
+  -h, --help                 output usage information
 ```
 
 Reads environment variables, in imitation of [seth](https://github.com/dapphub/dapptools/blob/master/src/seth/README.md).
