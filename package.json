@@ -9,7 +9,7 @@
     "@babel/register": "^7.6.2",
     "@babel/runtime": "^7.6.0",
     "@makerdao/currency": "^0.9.6",
-    "@makerdao/dai": "^0.19.0-rc1",
+    "@makerdao/dai": "^0.21.0",
     "@makerdao/dai-plugin-config": "^0.2.14-rc.1",
     "@makerdao/dai-plugin-mcd": "0.2.15",
     "@makerdao/testchain-client": "^0.2.14",
