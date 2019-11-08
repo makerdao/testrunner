@@ -12,6 +12,7 @@ import debug from 'debug';
 import RandomWeights from 'random-seed-weighted-chooser';
 import fs from 'fs';
 import path from 'path';
+import { filter } from './helpers/utils';
 const log = debug('testrunner:engine');
 
 export default class Engine {
@@ -80,9 +81,6 @@ export default class Engine {
     const plan = this._options.plans
       ? this._importPlans(this._options.plans)
       : null;
-    const actions = this._randomActionCheck(
-      this._options.actions || plan.actions
-    );
 
     let actors;
     log('importing actors...');
@@ -91,6 +89,11 @@ export default class Engine {
     } catch (error) {
       return failAtIndex(-1, error);
     }
+
+    const actions = await this._randomActionCheck(
+      this._options.actions || plan.actions,
+      actors
+    );
 
     log('running actions...');
     for (const action of actions) {
@@ -150,6 +153,20 @@ export default class Engine {
     return result;
   }
 
+  async _filterActions(actions, importedActor) {
+    return await filter(actions, async action => {
+      const importedAction =
+        ACTIONS[typeof action === 'object' ? action[0] : action];
+      if (importedAction.before === undefined) return true;
+      if (importedActor.address)
+        this._maker.useAccountWithAddress(importedActor.address);
+      return await this._runStep(
+        importedAction.before.bind(importedAction),
+        importedActor
+      );
+    });
+  }
+
   _runStep(step, actor, lastResult) {
     return step(actor, {
       maker: this._maker,
@@ -194,21 +211,26 @@ export default class Engine {
     return typeof list[index] === 'object' ? list[index][0] : list[index];
   }
 
-  _randomActionCheck(actions) {
+  async _randomActionCheck(actions, actors) {
     const orderedActions = [...actions];
-    orderedActions.forEach((action, index) => {
-      if (action.length === 1) {
-        orderedActions.splice(index, 1, ...shuffle(action[0]));
-      } else {
-        if (typeof action[0] === 'object') {
-          action[0] = this._randomElement(action[0]);
+    for (const index in actions) {
+      if (Object.prototype.hasOwnProperty.call(actions, index)) {
+        const action = actions[index];
+        if (action.length === 1) {
+          orderedActions.splice(index, 1, ...shuffle(action[0]));
+        } else {
+          if (typeof action[0] === 'object') {
+            action[0] = this._randomElement(action[0]);
+          }
+          if (typeof action[1] === 'object') {
+            action[1] = this._randomElement(
+              await this._filterActions(action[1], actors[action[0]])
+            );
+          }
+          orderedActions.splice(index, 1, action);
         }
-        if (typeof action[1] === 'object') {
-          action[1] = this._randomElement(action[1]);
-        }
-        orderedActions.splice(index, 1, action);
       }
-    });
+    }
     return orderedActions;
   }
 }

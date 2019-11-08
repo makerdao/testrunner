@@ -216,6 +216,23 @@ test('pick a random actions and users based on a weight', async () => {
   expect(report1.completed.length).toEqual(10);
 });
 
+test('run only tests executable by user', async () => {
+  const engine = new Engine({
+    actors: { user1: 'selfTestUser', user2: 'selfTestUser' },
+    actions: [
+      [[['user1', 999], ['user2', 1]], ['runIfUser1', 'runIfUser2']],
+      [[['user2', 999], ['user1', 1]], ['runIfUser1', 'runIfUser2']]
+    ]
+  });
+  const report = await engine.run();
+
+  expect(report).toEqual({
+    results: ['0xa', '0xb'],
+    success: true,
+    completed: [['user1', 'runIfUser1'], ['user2', 'runIfUser2']]
+  });
+});
+
 test('throw when given invalid plans, actions, or actors', async () => {
   const invalidParams = [
     {},
