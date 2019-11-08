@@ -224,11 +224,10 @@ export default class Engine {
 
   _randomAction(actions) {
     if (actions[0][2] !== undefined) {
-      return [
-        RandomWeights.chooseWeightedObject(
-          actions.map(action => ({ a: action, weight: action[2] }))
-        ).a
-      ];
+      const index = RandomWeights.chooseWeightedIndex(
+        actions.map(a => a[2] || 1)
+      );
+      return [actions[index]];
     }
     return shuffle(actions);
   }
