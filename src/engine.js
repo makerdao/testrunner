@@ -27,6 +27,7 @@ export default class Engine {
         fs.existsSync(options.addressesConfig),
         'Addresses config file must exist'
       );
+      this._addressesConfig = require(options.addressesConfig);
     }
 
     this._options = options;
@@ -60,15 +61,13 @@ export default class Engine {
       // n.b. this means that Maker is only set up when url is explicitly set--
       // this is only temporary
       try {
-        const addresses = require(this._options.addressesConfg);
-
         log('setting up maker instance...');
         this._maker = await Maker.create('http', {
           url: this._options.url,
           plugins: [[McdPlugin, { prefetch: false }]],
           log: false,
           smartContract: {
-            addressOverrides: addresses
+            addressOverrides: this._addressesConfig
           }
         });
         log('succeeded in setting up maker instance.');
