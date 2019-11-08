@@ -14,14 +14,16 @@ export default {
   actions: [
     ['user1', 'checkUser'],
     [
-      ['user3', 'checkUser'],
-      ['user4', 'checkUser'],
-      ['user5', 'checkUser'],
-      ['user6', 'checkUser'],
-      ['user7', 'checkUser'],
-      ['user8', 'checkUser'],
-      ['user9', 'checkUser'],
-      ['user10', 'checkUser']
+      [
+        ['user3', 'checkUser'],
+        ['user4', 'checkUser'],
+        ['user5', 'checkUser'],
+        ['user6', 'checkUser'],
+        ['user7', 'checkUser'],
+        ['user8', 'checkUser'],
+        ['user9', 'checkUser'],
+        ['user10', 'checkUser']
+      ]
     ],
     ['user2', 'checkUser']
   ]

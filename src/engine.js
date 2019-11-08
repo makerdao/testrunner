@@ -177,66 +177,36 @@ export default class Engine {
       (result, plan) => {
         const importedPlan = PLANS[plan];
         assert(importedPlan, `Could not import plan: ${plan}`);
-
-        if (importedPlan.mode === 'random') {
-          const randomActor = this._randomActor({ ...importedPlan.actors });
-          result.actors = { ...result.actors, ...randomActor };
-          let actions = importedPlan.actions;
-          actions.forEach((action, index) => {
-            if (typeof action[0] === 'object') {
-              actions.splice(
-                index,
-                1,
-                ...this._randomAction(action).map(act => [
-                  Object.keys(randomActor)[0],
-                  act[1],
-                  act[2]
-                ])
-              );
-            }
-          });
-          actions = this._randomAction(importedPlan.actions).map(action => [
-            Object.keys(randomActor)[0],
-            action[1],
-            action[2]
-          ]);
-          result.actions = result.actions.concat(actions);
-        } else {
-          result.actors = { ...result.actors, ...importedPlan.actors };
-          result.actions = result.actions.concat(importedPlan.actions);
-        }
+        result.actors = { ...result.actors, ...importedPlan.actors };
+        const actions =
+          importedPlan.mode === 'random'
+            ? shuffle(importedPlan.actions)
+            : importedPlan.actions;
+        result.actions = result.actions.concat(actions);
         return result;
       },
       { actors: {}, actions: [] }
     );
   }
 
-  _randomActor(actors) {
-    const actor = RandomWeights.chooseWeightedObject(
-      Object.keys(actors).map(actorName => ({
-        name: actorName,
-        a: actors[actorName],
-        weight: actors[actorName][1] || 1
-      }))
-    );
-    return { [actor.name]: actor.a };
-  }
-
-  _randomAction(actions) {
-    if (actions[0][2] !== undefined) {
-      const index = RandomWeights.chooseWeightedIndex(
-        actions.map(a => a[2] || 1)
-      );
-      return [actions[index]];
-    }
-    return shuffle(actions);
+  _randomElement(list) {
+    const index = RandomWeights.chooseWeightedIndex(list.map(a => a[1] || 1));
+    return typeof list[index] === 'object' ? list[index][0] : list[index];
   }
 
   _randomActionCheck(actions) {
     const orderedActions = [...actions];
     orderedActions.forEach((action, index) => {
-      if (typeof action[0] === 'object') {
-        orderedActions.splice(index, 1, ...this._randomAction(action));
+      if (action.length === 1) {
+        orderedActions.splice(index, 1, ...shuffle(action[0]));
+      } else {
+        if (typeof action[0] === 'object') {
+          action[0] = this._randomElement(action[0]);
+        }
+        if (typeof action[1] === 'object') {
+          action[1] = this._randomElement(action[1]);
+        }
+        orderedActions.splice(index, 1, action);
       }
     });
     return orderedActions;

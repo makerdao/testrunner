@@ -139,14 +139,16 @@ test('randomize nested actions', async () => {
     actions: [
       ['user1', 'checkUser'],
       [
-        ['user3', 'checkUser'],
-        ['user4', 'checkUser'],
-        ['user5', 'checkUser'],
-        ['user6', 'checkUser'],
-        ['user7', 'checkUser'],
-        ['user8', 'checkUser'],
-        ['user9', 'checkUser'],
-        ['user10', 'checkUser']
+        [
+          ['user3', 'checkUser'],
+          ['user4', 'checkUser'],
+          ['user5', 'checkUser'],
+          ['user6', 'checkUser'],
+          ['user7', 'checkUser'],
+          ['user8', 'checkUser'],
+          ['user9', 'checkUser'],
+          ['user10', 'checkUser']
+        ]
       ],
       ['user2', 'checkUser']
     ]
@@ -201,7 +203,7 @@ test('pick a random action in a nested action in random mode', async () => {
   expect(report1.completed.length).toEqual(4);
 });
 
-test('pick a random action based on a weight and skip the others', async () => {
+test('pick a random actions and users based on a weight', async () => {
   const engine = new Engine({ plans: ['selfTestF'] });
   const report1 = await engine.run();
   let report2 = await engine.run();
@@ -211,7 +213,7 @@ test('pick a random action based on a weight and skip the others', async () => {
   }
 
   expect(report1).not.toEqual(report2);
-  expect(report1.completed.length).toEqual(1);
+  expect(report1.completed.length).toEqual(10);
 });
 
 test('throw when given invalid plans, actions, or actors', async () => {

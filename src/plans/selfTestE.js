@@ -15,13 +15,17 @@ export default {
     ['user1', 'checkUser'],
     ['user2', 'checkUser'],
     [
-      ['user3', 'checkUser', 10],
-      ['user4', 'checkUser', 50],
-      ['user5', 'checkUser', 20],
-      ['user6', 'checkUser', 1],
-      ['user7', 'checkUser', 55],
-      ['user8', 'checkUser', 72],
-      ['user9', 'checkUser', 45]
+      [
+        ['user3', 10],
+        ['user3', 10],
+        ['user4', 50],
+        ['user5', 20],
+        ['user6', 1],
+        ['user7', 55],
+        ['user8', 72],
+        ['user9', 45]
+      ],
+      'checkUser'
     ],
     ['user10', 'checkUser']
   ],
