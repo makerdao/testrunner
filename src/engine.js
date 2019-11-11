@@ -64,7 +64,12 @@ export default class Engine {
         log('setting up maker instance...');
         this._maker = await Maker.create('http', {
           url: this._options.url,
-          plugins: [[McdPlugin, { prefetch: false }]],
+          plugins: [
+            [
+              McdPlugin,
+              { addressOverrides: this._addressesConfig, prefetch: false }
+            ]
+          ],
           log: false,
           smartContract: {
             addressOverrides: this._addressesConfig

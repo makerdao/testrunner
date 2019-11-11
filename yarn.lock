@@ -860,10 +860,10 @@
     "@makerdao/services-core" "^0.9.9"
     bignumber.js "^8.1.1"
 
-"@makerdao/dai@^0.19.0-rc1":
-  version "0.19.0-rc1"
-  resolved "https://registry.yarnpkg.com/@makerdao/dai/-/dai-0.19.0-rc1.tgz#13f86f06a085403b81bb838ce1cdbfb838793e81"
-  integrity sha512-L4pYKPel06QVsEm9YkJhkJ8irShf60J0l/A0mYLOa8qu7oAcVFK5rfbozXryeH5WzHK5odlUkDmtgI+ofFh4HA==
+"@makerdao/dai@^0.21.0":
+  version "0.21.0"
+  resolved "https://registry.yarnpkg.com/@makerdao/dai/-/dai-0.21.0.tgz#361707cdaa1da1a58adf41b3b0786c2a19447871"
+  integrity sha512-K6/pZ+u26ewmbjaP/u/nHC22rBGHQNmAct9FCp+TaCxwz5n/VkMzCLvfUBO+IzPvXpMuFIrPdSrgT8+apLHJ+w==
   dependencies:
     "@babel/runtime" "^7.3.4"
     "@makerdao/currency" "^0.9.5"
@@ -4077,7 +4077,7 @@ functional-red-black-tree@^1.0.1:
   resolved "https://registry.yarnpkg.com/functional-red-black-tree/-/functional-red-black-tree-1.0.1.tgz#1b0ab3bd553b2a0d6399d29c0e3ea0b252078327"
   integrity sha1-GwqzvVU7Kg1jmdKcDj6gslIHgyc=
 
-"ganache-cli@github:makerdao/ganache-cli#fix/gas-est-crash":
+ganache-cli@makerdao/ganache-cli#fix/gas-est-crash:
   version "6.4.3-beta.0"
   resolved "https://codeload.github.com/makerdao/ganache-cli/tar.gz/3e512b61da2479042627e6155231dcb038110650"
   dependencies:
