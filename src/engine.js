@@ -168,13 +168,13 @@ export default class Engine {
   }
 
   async _filterActions(actions, importedActor) {
-    return await filter(actions, async action => {
+    return filter(actions, async action => {
       const importedAction =
         ACTIONS[typeof action === 'object' ? action[0] : action];
       if (importedAction.before === undefined) return true;
       if (importedActor.address)
         this._maker.useAccountWithAddress(importedActor.address);
-      return await this._runStep(
+      return this._runStep(
         importedAction.before.bind(importedAction),
         importedActor
       );
@@ -232,10 +232,11 @@ export default class Engine {
   }
 
   async _randomActionCheck(actions, actors, seed) {
-    let orderedActions = [];
-    for (const action of [...actions]) {
+    let orderedActions = [...actions];
+    for (const index in orderedActions) {
+      const action = orderedActions[index];
       if (action.length === 1) {
-        orderedActions.push(...shuffle(action[0], seed));
+        orderedActions.splice(index, 1, ...shuffle(action[0], seed));
       } else {
         const selectedActor =
           typeof action[0] === 'object'
@@ -248,7 +249,7 @@ export default class Engine {
                 seed
               )
             : action[1];
-        orderedActions.push([selectedActor, selectedAction]);
+        orderedActions.splice(index, 1, [selectedActor, selectedAction]);
       }
     }
     return orderedActions;
