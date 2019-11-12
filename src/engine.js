@@ -22,7 +22,7 @@ export default class Engine {
     // Will contain list of dai.js lib options (if passed)
     this._daijsConfig = null;
     // Will contain list of addresses for dai.js lib (if passed)
-    this._addressesConfig = null;
+    this._addressesConfig = {};
 
     const { plans, actions, actors } = options;
     assert(
