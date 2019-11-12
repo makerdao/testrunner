@@ -9,6 +9,7 @@ import castArray from 'lodash/castArray';
 import Maker from '@makerdao/dai';
 import McdPlugin from '@makerdao/dai-plugin-mcd';
 import debug from 'debug';
+import RandomWeights from 'random-seed-weighted-chooser';
 import fs from 'fs';
 import path from 'path';
 const log = debug('testrunner:engine');
@@ -99,12 +100,12 @@ export default class Engine {
     log('running actions...');
     for (const action of actions) {
       if (!report.success) break;
-
-      const [actorName, actionName] = action;
+      let [actorName, actionName] = action;
       try {
         const importedAction = ACTIONS[actionName];
         assert(importedAction, `Could not import action: ${actionName}`);
 
+        if (!actorName) actorName = Object.keys(actors)[0];
         const importedActor = actors[actorName];
         assert(importedActor, `Missing actor: ${actorName}`);
 
@@ -185,7 +186,6 @@ export default class Engine {
         const importedPlan = PLANS[plan];
         assert(importedPlan, `Could not import plan: ${plan}`);
         result.actors = { ...result.actors, ...importedPlan.actors };
-
         const actions =
           importedPlan.mode === 'random'
             ? shuffle(importedPlan.actions)
@@ -197,11 +197,24 @@ export default class Engine {
     );
   }
 
+  _randomElement(list) {
+    const index = RandomWeights.chooseWeightedIndex(list.map(a => a[1] || 1));
+    return typeof list[index] === 'object' ? list[index][0] : list[index];
+  }
+
   _randomActionCheck(actions) {
     const orderedActions = [...actions];
     orderedActions.forEach((action, index) => {
-      if (typeof action[0] === 'object') {
-        orderedActions.splice(index, 1, ...shuffle(action));
+      if (action.length === 1) {
+        orderedActions.splice(index, 1, ...shuffle(action[0]));
+      } else {
+        if (typeof action[0] === 'object') {
+          action[0] = this._randomElement(action[0]);
+        }
+        if (typeof action[1] === 'object') {
+          action[1] = this._randomElement(action[1]);
+        }
+        orderedActions.splice(index, 1, action);
       }
     });
     return orderedActions;

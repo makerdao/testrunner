@@ -139,14 +139,16 @@ test('randomize nested actions', async () => {
     actions: [
       ['user1', 'checkUser'],
       [
-        ['user3', 'checkUser'],
-        ['user4', 'checkUser'],
-        ['user5', 'checkUser'],
-        ['user6', 'checkUser'],
-        ['user7', 'checkUser'],
-        ['user8', 'checkUser'],
-        ['user9', 'checkUser'],
-        ['user10', 'checkUser']
+        [
+          ['user3', 'checkUser'],
+          ['user4', 'checkUser'],
+          ['user5', 'checkUser'],
+          ['user6', 'checkUser'],
+          ['user7', 'checkUser'],
+          ['user8', 'checkUser'],
+          ['user9', 'checkUser'],
+          ['user10', 'checkUser']
+        ]
       ],
       ['user2', 'checkUser']
     ]
@@ -172,6 +174,7 @@ test('randomize nested actions from imported plans', async () => {
   }
 
   expect(report1).not.toEqual(report2);
+  expect(report1.completed.length).toEqual(10);
 });
 
 test('randomize all actions when plan mode is set to random', async () => {
@@ -184,6 +187,33 @@ test('randomize all actions when plan mode is set to random', async () => {
   }
 
   expect(report1).not.toEqual(report2);
+  expect(report1.completed.length).toEqual(10);
+});
+
+test('pick a random action in a nested action in random mode', async () => {
+  const engine = new Engine({ plans: ['selfTestE'] });
+  const report1 = await engine.run();
+  let report2 = await engine.run();
+
+  if (report1 === report2) {
+    report2 = await engine.run();
+  }
+
+  expect(report1).not.toEqual(report2);
+  expect(report1.completed.length).toEqual(4);
+});
+
+test('pick a random actions and users based on a weight', async () => {
+  const engine = new Engine({ plans: ['selfTestF'] });
+  const report1 = await engine.run();
+  let report2 = await engine.run();
+
+  if (report1 === report2) {
+    report2 = await engine.run();
+  }
+
+  expect(report1).not.toEqual(report2);
+  expect(report1.completed.length).toEqual(10);
 });
 
 test('throw when given invalid plans, actions, or actors', async () => {

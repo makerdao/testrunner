@@ -13,18 +13,21 @@ export default {
   },
   actions: [
     ['user1', 'checkUser'],
+    ['user2', 'checkUser'],
     [
       [
-        ['user3', 'checkUser'],
-        ['user4', 'checkUser'],
-        ['user5', 'checkUser'],
-        ['user6', 'checkUser'],
-        ['user7', 'checkUser'],
-        ['user8', 'checkUser'],
-        ['user9', 'checkUser'],
-        ['user10', 'checkUser']
-      ]
+        ['user3', 10],
+        ['user3', 10],
+        ['user4', 50],
+        ['user5', 20],
+        ['user6', 1],
+        ['user7', 55],
+        ['user8', 72],
+        ['user9', 45]
+      ],
+      'checkUser'
     ],
-    ['user2', 'checkUser']
-  ]
+    ['user10', 'checkUser']
+  ],
+  mode: 'random'
 };
