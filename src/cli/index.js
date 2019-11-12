@@ -18,7 +18,7 @@ args
     'use RPC accounts instead of keystore (ETH_RPC_ACCOUNTS)'
   )
   .option('-s, --seed <seed>', 'seed to the PRNG')
-  .option('--sleepduration <seconds>', 'sleep after the testplan', 0)
+  .option('--sleep <seconds>', 'seconds to wait between iterations', 0)
   .option('-u, --url <url>', 'RPC url')
   .option('-v, --verbose', 'verbose output');
 
