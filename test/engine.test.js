@@ -316,6 +316,32 @@ test('different random seed yield different plans', async () => {
   expect(report1).not.toEqual(report2);
 });
 
+test('run two iterations of a random test plan, yielding different results', async () => {
+  const engine1 = new Engine({
+    actors: {
+      user1: 'selfTestUser',
+      user2: 'selfTestUser',
+      user3: 'selfTestUser',
+      user4: 'selfTestUser',
+      user5: 'selfTestUser'
+    },
+    actions: [
+      [
+        ['user1', 'user2', 'user3', 'user4', 'user5'],
+        [['checkUser', 10], ['checkUser', 90]]
+      ]
+    ],
+    seed: 1,
+    iterations: 2,
+    sleepduration: 1
+  });
+  const report = await engine1.run();
+
+  expect(report.success).toBeTruthy();
+  expect(report.completed.length).toEqual(2);
+  expect(report.completed[0]).not.toEqual(report.completed[1]);
+});
+
 test('throw when given invalid plans, actions, or actors', async () => {
   const invalidParams = [
     {},

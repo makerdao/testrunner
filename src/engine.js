@@ -33,6 +33,10 @@ export default class Engine {
       this._addressesConfig = require(options.addressesConfig);
     }
 
+    if (options.iterations === undefined) {
+      options.iterations = 1;
+    }
+
     this._options = options;
   }
 
