@@ -160,13 +160,16 @@ export default class Engine {
 
   async _importActors(actors) {
     const result = {};
-
     for (let name of Object.keys(actors)) {
-      const actor = Array.isArray(actors[name])
-        ? actors[name][0]
-        : actors[name];
-      assert(ACTORS[actor], `Could not import actor: { ${name}: ${actor} }`);
-      result[name] = await ACTORS[actor](name, this._maker, this._options);
+      assert(
+        ACTORS[actors[name]],
+        `Could not import actor: { ${name}: ${actors[name]} }`
+      );
+      result[name] = await ACTORS[actors[name]](
+        name,
+        this._maker,
+        this._options
+      );
       log(`imported actor: ${name}`);
     }
     return result;
