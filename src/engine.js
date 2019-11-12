@@ -126,7 +126,7 @@ export default class Engine {
           return failAtIndex(report.results.length, error);
         }
       }
-      await sleep(this._options.sleepduration * 1000);
+      await sleep(this._options.sleep * 1000);
     } while (++i !== parseInt(this._options.iterations));
 
     return report;
