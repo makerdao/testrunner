@@ -233,6 +233,89 @@ test('run only tests executable by user', async () => {
   });
 });
 
+test('identical random seed yield identical plans', async () => {
+  const engine1 = new Engine({
+    actors: {
+      user1: 'selfTestUser',
+      user2: 'selfTestUser',
+      user3: 'selfTestUser',
+      user4: 'selfTestUser',
+      user5: 'selfTestUser'
+    },
+    actions: [
+      [
+        ['user1', 'user2', 'user3', 'user4', 'user5'],
+        [['checkUser', 10], ['checkUser', 90]]
+      ]
+    ],
+    seed: 1234
+  });
+  const report1 = await engine1.run();
+
+  const engine2 = new Engine({
+    actors: {
+      user1: 'selfTestUser',
+      user2: 'selfTestUser',
+      user3: 'selfTestUser',
+      user4: 'selfTestUser',
+      user5: 'selfTestUser'
+    },
+    actions: [
+      [
+        ['user1', 'user2', 'user3', 'user4', 'user5'],
+        [['checkUser', 10], ['checkUser', 90]]
+      ]
+    ],
+    seed: 1234
+  });
+  const report2 = await engine2.run();
+
+  expect(report1.success).toBeTruthy();
+  expect(report1).toEqual(report2);
+});
+
+test('different random seed yield different plans', async () => {
+  const engine1 = new Engine({
+    actors: {
+      user1: 'selfTestUser',
+      user2: 'selfTestUser',
+      user3: 'selfTestUser',
+      user4: 'selfTestUser',
+      user5: 'selfTestUser'
+    },
+    actions: [
+      [
+        ['user1', 'user2', 'user3', 'user4', 'user5'],
+        [['checkUser', 10], ['checkUser', 90]]
+      ]
+    ],
+    seed: 5678
+  });
+  const report1 = await engine1.run();
+
+  const engine2 = new Engine({
+    actors: {
+      user1: 'selfTestUser',
+      user2: 'selfTestUser',
+      user3: 'selfTestUser',
+      user4: 'selfTestUser',
+      user5: 'selfTestUser'
+    },
+    actions: [
+      [
+        ['user1', 'user2', 'user3', 'user4', 'user5'],
+        [['checkUser', 10], ['checkUser', 90]]
+      ]
+    ],
+    seed: 1234
+  });
+  const report2 = await engine2.run();
+
+  expect(report1.success).toBeTruthy();
+  expect(report2.success).toBeTruthy();
+  expect(report1).not.toEqual(report2);
+});
+
 test('throw when given invalid plans, actions, or actors', async () => {
   const invalidParams = [
     {},

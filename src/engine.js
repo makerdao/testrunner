@@ -97,7 +97,8 @@ export default class Engine {
 
     const actions = await this._randomActionCheck(
       this._options.actions || plan.actions,
-      actors
+      actors,
+      this._options.seed
     );
 
     log('running actions...');
@@ -211,12 +212,15 @@ export default class Engine {
     );
   }
 
-  _randomElement(list) {
-    const index = RandomWeights.chooseWeightedIndex(list.map(a => a[1] || 1));
+  _randomElement(list, seed) {
+    const index = RandomWeights.chooseWeightedIndex(
+      list.map(a => a[1] || 1),
+      seed
+    );
     return typeof list[index] === 'object' ? list[index][0] : list[index];
   }
 
-  async _randomActionCheck(actions, actors) {
+  async _randomActionCheck(actions, actors, seed) {
     const orderedActions = [...actions];
     for (const index in actions) {
       if (Object.prototype.hasOwnProperty.call(actions, index)) {
@@ -225,11 +229,12 @@ export default class Engine {
           orderedActions.splice(index, 1, ...shuffle(action[0]));
         } else {
           if (typeof action[0] === 'object') {
-            action[0] = this._randomElement(action[0]);
+            action[0] = this._randomElement(action[0], seed);
           }
           if (typeof action[1] === 'object') {
             action[1] = this._randomElement(
-              await this._filterActions(action[1], actors[action[0]])
+              await this._filterActions(action[1], actors[action[0]]),
+              seed
             );
           }
           orderedActions.splice(index, 1, action);
