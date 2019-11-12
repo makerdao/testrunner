@@ -12,6 +12,7 @@ args
     '-r, --rpc-accounts',
     'use RPC accounts instead of keystore (ETH_RPC_ACCOUNTS)'
   )
+  .option('-s, --seed <seed>', 'seed to the PRNG')
   .option('-u, --url <url>', 'RPC url')
   .option('-v, --verbose', 'verbose output');
 
