@@ -1,5 +1,5 @@
 export default {
-  before: user => {
+  precondition: user => {
     return user.name === 'user1';
   },
   operation: async user => {

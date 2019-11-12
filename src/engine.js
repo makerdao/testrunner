@@ -171,11 +171,11 @@ export default class Engine {
     return filter(actions, async action => {
       const importedAction =
         ACTIONS[typeof action === 'object' ? action[0] : action];
-      if (importedAction.before === undefined) return true;
+      if (importedAction.precondition === undefined) return true;
       if (importedActor.address)
         this._maker.useAccountWithAddress(importedActor.address);
       return this._runStep(
-        importedAction.before.bind(importedAction),
+        importedAction.precondition.bind(importedAction),
         importedActor
       );
     });
