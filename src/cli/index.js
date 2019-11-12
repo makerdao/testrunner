@@ -5,6 +5,11 @@ args
   .option('--alert <type>', 'alerter type [console, rocketchat]', 'console')
   .option('--alert-level <level>', 'alert level [info, error]', 'info')
   .option('-c, --config <file>', 'config file name')
+  .option(
+    '-i, --iterations <num>',
+    'repeat the testplan <num> times. 0 is infinite',
+    1
+  )
   .option('-k, --keystore <dir>', 'keystore for defaultAccount (ETH_KEYSTORE)')
   .option('--password', 'key password (ETH_PASSWORD)')
   .option('-p, --plan <name>', 'plan name')
@@ -13,6 +18,7 @@ args
     'use RPC accounts instead of keystore (ETH_RPC_ACCOUNTS)'
   )
   .option('-s, --seed <seed>', 'seed to the PRNG')
+  .option('--sleepduration <seconds>', 'sleep after the testplan', 0)
   .option('-u, --url <url>', 'RPC url')
   .option('-v, --verbose', 'verbose output');
 

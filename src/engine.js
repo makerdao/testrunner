@@ -14,6 +14,7 @@ import fs from 'fs';
 import path from 'path';
 import { filter } from './helpers/utils';
 const log = debug('testrunner:engine');
+import { sleep } from './helpers/utils';
 
 export default class Engine {
   constructor(options = {}) {
@@ -83,43 +84,46 @@ export default class Engine {
       }
     }
 
-    const plan = this._options.plans
-      ? this._importPlans(this._options.plans, this._options.seed)
-      : null;
+    let i = 0;
+    do {
+      const plan = this._options.plans
+        ? this._importPlans(this._options.plans, this._options.seed + i)
+        : null;
 
-    let actors;
-    log('importing actors...');
-    try {
-      actors = await this._importActors(this._options.actors || plan.actors);
-    } catch (error) {
-      return failAtIndex(-1, error);
-    }
-
-    const actions = await this._randomActionCheck(
-      this._options.actions || plan.actions,
-      actors,
-      this._options.seed
-    );
-
-    log('running actions...');
-    for (const action of actions) {
-      if (!report.success) break;
-      let [actorName, actionName] = action;
+      let actors;
+      log('importing actors...');
       try {
-        const importedAction = ACTIONS[actionName];
-        assert(importedAction, `Could not import action: ${actionName}`);
-
-        if (!actorName) actorName = Object.keys(actors)[0];
-        const importedActor = actors[actorName];
-        assert(importedActor, `Missing actor: ${actorName}`);
-
-        const result = await this._runAction(importedAction, importedActor);
-        report.results.push(result);
-        report.completed.push(action);
+        actors = await this._importActors(this._options.actors || plan.actors);
       } catch (error) {
-        return failAtIndex(report.results.length, error);
+        return failAtIndex(-1, error);
       }
-    }
+
+      const actions = await this._randomActionCheck(
+        this._options.actions || plan.actions,
+        actors,
+        this._options.seed + i
+      );
+
+      log('running actions...');
+      for (const action of actions) {
+        if (!report.success) break;
+        try {
+          let [actorName, actionName] = action;
+          const importedAction = ACTIONS[actionName];
+          assert(importedAction, `Could not import action: ${actionName}`);
+
+          const importedActor = actors[actorName];
+          assert(importedActor, `Missing actor: ${actorName}`);
+
+          const result = await this._runAction(importedAction, importedActor);
+          report.results.push(result);
+          report.completed.push(action);
+        } catch (error) {
+          return failAtIndex(report.results.length, error);
+        }
+      }
+      await sleep(this._options.sleepduration * 1000);
+    } while (++i !== parseInt(this._options.iterations));
 
     return report;
   }
@@ -224,24 +228,23 @@ export default class Engine {
   }
 
   async _randomActionCheck(actions, actors, seed) {
-    const orderedActions = [...actions];
-    for (const index in actions) {
-      if (Object.prototype.hasOwnProperty.call(actions, index)) {
-        const action = actions[index];
-        if (action.length === 1) {
-          orderedActions.splice(index, 1, ...shuffle(action[0], seed));
-        } else {
-          if (typeof action[0] === 'object') {
-            action[0] = this._randomElement(action[0], seed);
-          }
-          if (typeof action[1] === 'object') {
-            action[1] = this._randomElement(
-              await this._filterActions(action[1], actors[action[0]]),
-              seed
-            );
-          }
-          orderedActions.splice(index, 1, action);
-        }
+    let orderedActions = [];
+    for (const action of [...actions]) {
+      if (action.length === 1) {
+        orderedActions.push(...shuffle(action[0], seed));
+      } else {
+        const selectedActor =
+          typeof action[0] === 'object'
+            ? this._randomElement(action[0], seed)
+            : action[0];
+        const selectedAction =
+          typeof action[1] === 'object'
+            ? this._randomElement(
+                await this._filterActions(action[1], actors[selectedActor]),
+                seed
+              )
+            : action[1];
+        orderedActions.push([selectedActor, selectedAction]);
       }
     }
     return orderedActions;

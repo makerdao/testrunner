@@ -8,3 +8,5 @@ export async function filter(arr, callback) {
     arr.map(async item => ((await callback(item)) ? item : fail))
   )).filter(i => i !== fail);
 }
+
+export const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
