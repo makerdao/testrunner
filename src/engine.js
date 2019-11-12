@@ -4,7 +4,7 @@ import PLANS from './plans';
 import ALERTERS from './alerters';
 import createClient from './testchain';
 import assert from 'assert';
-import shuffle from 'lodash/shuffle';
+import shuffle from 'knuth-shuffle-seeded';
 import castArray from 'lodash/castArray';
 import Maker from '@makerdao/dai';
 import McdPlugin from '@makerdao/dai-plugin-mcd';
@@ -79,7 +79,7 @@ export default class Engine {
     }
 
     const plan = this._options.plans
-      ? this._importPlans(this._options.plans)
+      ? this._importPlans(this._options.plans, this._options.seed)
       : null;
 
     let actors;
@@ -190,7 +190,7 @@ export default class Engine {
     return result;
   }
 
-  _importPlans(plans) {
+  _importPlans(plans, seed) {
     return plans.reduce(
       (result, plan) => {
         const importedPlan = PLANS[plan];
@@ -198,7 +198,7 @@ export default class Engine {
         result.actors = { ...result.actors, ...importedPlan.actors };
         const actions =
           importedPlan.mode === 'random'
-            ? shuffle(importedPlan.actions)
+            ? shuffle(importedPlan.actions, seed)
             : importedPlan.actions;
         result.actions = result.actions.concat(actions);
         return result;
@@ -221,7 +221,7 @@ export default class Engine {
       if (Object.prototype.hasOwnProperty.call(actions, index)) {
         const action = actions[index];
         if (action.length === 1) {
-          orderedActions.splice(index, 1, ...shuffle(action[0]));
+          orderedActions.splice(index, 1, ...shuffle(action[0], seed));
         } else {
           if (typeof action[0] === 'object') {
             action[0] = this._randomElement(action[0], seed);
