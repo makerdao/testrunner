@@ -13,17 +13,31 @@ import RandomWeights from 'random-seed-weighted-chooser';
 import fs from 'fs';
 import path from 'path';
 import { filter } from './helpers/utils';
+import _ from 'lodash';
 const log = debug('testrunner:engine');
 import { sleep } from './helpers/utils';
 
 export default class Engine {
   constructor(options = {}) {
+    // Will contain list of dai.js lib options (if passed)
+    this._daijsConfig = null;
+    // Will contain list of addresses for dai.js lib (if passed)
+    this._addressesConfig = null;
+
     const { plans, actions, actors } = options;
     assert(
       plans || (actors && actions),
       'Must provide { plans } OR { actors, actions }, but not both'
     );
 
+    // Check if config file exist and accesible
+    if (options.config) {
+      options.config = path.resolve(options.config);
+      assert(fs.existsSync(options.config), 'Configuration file must exist');
+      this._daijsConfig = require(options.config);
+    }
+
+    // Check if addresses.json config file exist and accesible
     if (options.addressesConfig) {
       options.addressesConfig = path.resolve(options.addressesConfig);
       assert(
@@ -111,7 +125,8 @@ export default class Engine {
       // this is only temporary
       try {
         log('setting up maker instance...');
-        this._maker = await Maker.create('http', {
+
+        let options = {
           url: this._options.url,
           plugins: [
             [
@@ -123,7 +138,16 @@ export default class Engine {
           smartContract: {
             addressOverrides: this._addressesConfig
           }
-        });
+        };
+        // Check if we do have configuration options loaded from file
+        // We have to set them for daijs lib.
+        // And because our options has higher priority we will override everything
+        // except our predefined options
+        if (this._daijsConfig) {
+          options = _.defaultsDeep(options, this._daijsConfig);
+        }
+
+        this._maker = await Maker.create('http', options);
         log('succeeded in setting up maker instance.');
       } catch (error) {
         return failAtIndex(-1, error);
