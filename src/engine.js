@@ -37,6 +37,10 @@ export default class Engine {
       options.iterations = 1;
     }
 
+    if (options.seed === undefined) {
+      options.seed = Math.floor(Math.random() * 1000);
+    }
+
     this._options = options;
   }
 
@@ -90,8 +94,9 @@ export default class Engine {
 
     let i = 0;
     do {
+      const iterationSeed = this._options.seed + i;
       const plan = this._options.plans
-        ? this._importPlans(this._options.plans, this._options.seed + i)
+        ? this._importPlans(this._options.plans, iterationSeed)
         : null;
 
       let actors;
@@ -105,7 +110,7 @@ export default class Engine {
       const actions = await this._randomActionCheck(
         this._options.actions || plan.actions,
         actors,
-        this._options.seed + i
+        iterationSeed
       );
 
       log('running actions...');
