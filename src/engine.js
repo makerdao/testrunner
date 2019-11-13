@@ -13,7 +13,7 @@ import RandomWeights from 'random-seed-weighted-chooser';
 import fs from 'fs';
 import path from 'path';
 import { filter } from './helpers/utils';
-import _ from 'lodash';
+import { defaultsDeep } from 'lodash';
 const log = debug('testrunner:engine');
 import { sleep } from './helpers/utils';
 
@@ -144,7 +144,7 @@ export default class Engine {
         // And because our options has higher priority we will override everything
         // except our predefined options
         if (this._daijsConfig) {
-          options = _.defaultsDeep(options, this._daijsConfig);
+          options = defaultsDeep({}, options, this._daijsConfig);
         }
 
         this._maker = await Maker.create('http', options);
