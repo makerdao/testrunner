@@ -37,11 +37,49 @@ export default class Engine {
       options.iterations = 1;
     }
 
-    if (options.seed === undefined) {
-      options.seed = Math.floor(Math.random() * 1000);
+    this._options = options;
+  }
+
+  async _runOnce(report, i, failAtIndex) {
+    const iterationSeed = this._options.seed
+      ? this._options.seed + i
+      : undefined;
+    const plan = this._options.plans
+      ? this._importPlans(this._options.plans, iterationSeed)
+      : null;
+
+    let actors;
+    log('importing actors...');
+    try {
+      actors = await this._importActors(this._options.actors || plan.actors);
+    } catch (error) {
+      return failAtIndex(-1, error);
     }
 
-    this._options = options;
+    const actions = await this._randomActionCheck(
+      this._options.actions || plan.actions,
+      actors,
+      iterationSeed
+    );
+
+    log('running actions...');
+    for (const action of actions) {
+      if (!report.success) break;
+      try {
+        let [actorName, actionName] = action;
+        const importedAction = ACTIONS[actionName];
+        assert(importedAction, `Could not import action: ${actionName}`);
+
+        const importedActor = actors[actorName];
+        assert(importedActor, `Missing actor: ${actorName}`);
+
+        const result = await this._runAction(importedAction, importedActor);
+        report.results.push(result);
+        report.completed.push(action);
+      } catch (error) {
+        return failAtIndex(report.results.length, error);
+      }
+    }
   }
 
   async run() {
@@ -94,43 +132,7 @@ export default class Engine {
 
     let i = 0;
     do {
-      const iterationSeed = this._options.seed + i;
-      const plan = this._options.plans
-        ? this._importPlans(this._options.plans, iterationSeed)
-        : null;
-
-      let actors;
-      log('importing actors...');
-      try {
-        actors = await this._importActors(this._options.actors || plan.actors);
-      } catch (error) {
-        return failAtIndex(-1, error);
-      }
-
-      const actions = await this._randomActionCheck(
-        this._options.actions || plan.actions,
-        actors,
-        iterationSeed
-      );
-
-      log('running actions...');
-      for (const action of actions) {
-        if (!report.success) break;
-        try {
-          let [actorName, actionName] = action;
-          const importedAction = ACTIONS[actionName];
-          assert(importedAction, `Could not import action: ${actionName}`);
-
-          const importedActor = actors[actorName];
-          assert(importedActor, `Missing actor: ${actorName}`);
-
-          const result = await this._runAction(importedAction, importedActor);
-          report.results.push(result);
-          report.completed.push(action);
-        } catch (error) {
-          return failAtIndex(report.results.length, error);
-        }
-      }
+      await this._runOnce(report, i, failAtIndex);
       await sleep(this._options.sleep * 1000);
     } while (++i !== parseInt(this._options.iterations));
 
