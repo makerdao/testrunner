@@ -13,7 +13,7 @@ import RandomWeights from 'random-seed-weighted-chooser';
 import fs from 'fs';
 import path from 'path';
 import { filter } from './helpers/utils';
-import { defaultsDeep } from 'lodash';
+import defaultsDeep from 'lodash/defaultsDeep';
 const log = debug('testrunner:engine');
 import { sleep } from './helpers/utils';
 
