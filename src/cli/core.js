@@ -5,7 +5,7 @@ export default async function main(options) {
   try {
     // TODO read the `config` arg to get additional configuration from a JSON file
     options = {
-      ...omit(options, ['plan', 'config']),
+      ...omit(options, ['plan']),
       plans: [options.plan]
     };
 
