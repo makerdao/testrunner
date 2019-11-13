@@ -3,10 +3,8 @@ export function stringToBytes(str) {
 }
 
 export async function filter(arr, callback) {
-  const fail = Symbol();
-  return (await Promise.all(
-    arr.map(async item => ((await callback(item)) ? item : fail))
-  )).filter(i => i !== fail);
+  const mask = await Promise.all(arr.map(callback));
+  return arr.filter((item, i) => mask[i]);
 }
 
 export const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
