@@ -216,6 +216,132 @@ test('pick a random actions and users based on a weight', async () => {
   expect(report1.completed.length).toEqual(10);
 });
 
+test('run only tests executable by user', async () => {
+  const engine = new Engine({
+    actors: { user1: 'selfTestUser', user2: 'selfTestUser' },
+    actions: [
+      [[['user1', 999], ['user2', 1]], ['runIfUser1', 'runIfUser2']],
+      [[['user2', 999], ['user1', 1]], ['runIfUser1', 'runIfUser2']]
+    ]
+  });
+  const report = await engine.run();
+
+  expect(report).toEqual({
+    results: ['0xa', '0xb'],
+    success: true,
+    completed: [['user1', 'runIfUser1'], ['user2', 'runIfUser2']]
+  });
+});
+
+test('identical random seed yield identical plans', async () => {
+  const engine1 = new Engine({
+    actors: {
+      user1: 'selfTestUser',
+      user2: 'selfTestUser',
+      user3: 'selfTestUser',
+      user4: 'selfTestUser',
+      user5: 'selfTestUser'
+    },
+    actions: [
+      [
+        ['user1', 'user2', 'user3', 'user4', 'user5'],
+        [['checkUser', 10], ['checkUser', 90]]
+      ]
+    ],
+    seed: 1234
+  });
+  const report1 = await engine1.run();
+
+  const engine2 = new Engine({
+    actors: {
+      user1: 'selfTestUser',
+      user2: 'selfTestUser',
+      user3: 'selfTestUser',
+      user4: 'selfTestUser',
+      user5: 'selfTestUser'
+    },
+    actions: [
+      [
+        ['user1', 'user2', 'user3', 'user4', 'user5'],
+        [['checkUser', 10], ['checkUser', 90]]
+      ]
+    ],
+    seed: 1234
+  });
+  const report2 = await engine2.run();
+
+  expect(report1.success).toBeTruthy();
+  expect(report1).toEqual(report2);
+});
+
+test('different random seed yield different plans', async () => {
+  const engine1 = new Engine({
+    actors: {
+      user1: 'selfTestUser',
+      user2: 'selfTestUser',
+      user3: 'selfTestUser',
+      user4: 'selfTestUser',
+      user5: 'selfTestUser'
+    },
+    actions: [
+      [
+        ['user1', 'user2', 'user3', 'user4', 'user5'],
+        [['checkUser', 10], ['checkUser', 90]]
+      ]
+    ],
+    seed: 5678
+  });
+  const report1 = await engine1.run();
+
+  const engine2 = new Engine({
+    actors: {
+      user1: 'selfTestUser',
+      user2: 'selfTestUser',
+      user3: 'selfTestUser',
+      user4: 'selfTestUser',
+      user5: 'selfTestUser'
+    },
+    actions: [
+      [
+        ['user1', 'user2', 'user3', 'user4', 'user5'],
+        [['checkUser', 10], ['checkUser', 90]]
+      ]
+    ],
+    seed: 1234
+  });
+  const report2 = await engine2.run();
+
+  expect(report1.success).toBeTruthy();
+  expect(report2.success).toBeTruthy();
+  expect(report1).not.toEqual(report2);
+});
+
+test('run two iterations of a random test plan, yielding different results', async () => {
+  const engine1 = new Engine({
+    actors: {
+      user1: 'selfTestUser',
+      user2: 'selfTestUser',
+      user3: 'selfTestUser',
+      user4: 'selfTestUser',
+      user5: 'selfTestUser'
+    },
+    actions: [
+      [
+        ['user1', 'user2', 'user3', 'user4', 'user5'],
+        [['checkUser', 10], ['checkUser', 90]]
+      ]
+    ],
+    seed: 1,
+    iterations: 2,
+    sleepduration: 1
+  });
+  const report = await engine1.run();
+
+  expect(report.success).toBeTruthy();
+  expect(report.completed.length).toEqual(2);
+  expect(report.completed[0]).not.toEqual(report.completed[1]);
+});
+
 test('throw when given invalid plans, actions, or actors', async () => {
   const invalidParams = [
     {},

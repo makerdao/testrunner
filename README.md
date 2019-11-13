@@ -21,6 +21,7 @@ Options:
   --password                 key password (ETH_PASSWORD)
   -p, --plan <name>          plan name
   -r, --rpc-accounts         use RPC accounts instead of keystore (ETH_RPC_ACCOUNTS)
+  -s, --seed <seed>          seed to the PRNG
   -u, --url <url>            RPC url
   -v, --verbose              verbose output
   -h, --help                 output usage information

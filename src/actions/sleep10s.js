@@ -1,4 +1,4 @@
-export const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+import { sleep } from '../helpers/utils';
 
 export default {
   before: () => {},
