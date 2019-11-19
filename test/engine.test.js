@@ -385,3 +385,31 @@ test('context', async () => {
   const report = await engine.run();
   expect(report.results).toEqual([3, 9, 15]);
 });
+
+test('action with parameters', async () => {
+  const engine = new Engine({
+    actors: {
+      user1: 'selfTestUser'
+    },
+    actions: [
+      [
+        'user1',
+        [
+          ['checkParameters', 1000, { params1: 999 }],
+          ['checkParameters', 1, { params1: 999 }]
+        ]
+      ],
+      [
+        'user1',
+        [
+          ['checkParameters', 1000, { params1: 111 }],
+          ['checkParameters', 1, { params1: 111 }]
+        ]
+      ]
+    ]
+  });
+
+  const report = await engine.run();
+  expect(report.results[0].params1).toEqual(1000);
+  expect(report.results[1].params1).toEqual(112);
+});
