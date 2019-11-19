@@ -426,3 +426,15 @@ test('action with random parameters', async () => {
   const report = await engine.run();
   expect(report.results[0]).toEqual(98);
 });
+
+test('async action', async () => {
+  const engine = new Engine({
+    actors: {
+      user1: 'selfTestUser'
+    },
+    actions: [['user1', ['checkAsync', 'checkAsync']]]
+  });
+
+  const report = await engine.run();
+  expect(report.success).toEqual(true);
+});
