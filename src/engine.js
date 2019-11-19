@@ -84,7 +84,8 @@ export default class Engine {
         const result = await this._runAction(
           importedAction,
           importedActor,
-          actionConfig
+          actionConfig,
+          iterationSeed
         );
         report.results.push(result);
         report.completed.push(action);
@@ -168,21 +169,23 @@ export default class Engine {
     // TODO
   }
 
-  async _runAction(action, actor, config) {
+  async _runAction(action, actor, config, seed) {
     const { before, operation, after } = action;
     if (actor.address) this._maker.useAccountWithAddress(actor.address);
 
     const beforeResult = before
-      ? await this._runStep(before.bind(action), actor, undefined, config)
+      ? await this._runStep(before.bind(action), actor, undefined, config, seed)
       : undefined;
     const result = await this._runStep(
       operation.bind(action),
       actor,
       beforeResult,
-      config
+      config,
+      seed
     );
 
-    if (after) await this._runStep(after.bind(action), actor, result);
+    if (after)
+      await this._runStep(after.bind(action), actor, result, config, seed);
     return result;
   }
 
@@ -203,12 +206,13 @@ export default class Engine {
     });
   }
 
-  _runStep(step, actor, lastResult, config) {
+  _runStep(step, actor, lastResult, config, seed) {
     return step(actor, {
       maker: this._maker,
       context: this._context,
       config,
-      lastResult
+      lastResult,
+      seed
     });
   }
 

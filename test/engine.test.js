@@ -413,3 +413,16 @@ test('action with parameters', async () => {
   expect(report.results[0].params1).toEqual(1000);
   expect(report.results[1].params1).toEqual(112);
 });
+
+test('action with random parameters', async () => {
+  const engine = new Engine({
+    actors: {
+      user1: 'selfTestUser'
+    },
+    actions: [['user1', 'checkRandom']],
+    seed: 123121
+  });
+
+  const report = await engine.run();
+  expect(report.results[0]).toEqual(98);
+});
