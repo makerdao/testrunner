@@ -5,7 +5,7 @@ export default {
   before: (_, { config }) => {
     config.ilk = config && config.ilk ? config.ilk : 'ETH-A';
     config.collateral =
-      config && config.collateral ? config.collateral : ETH(4);
+      config && config.collateral ? config.collateral : ETH(1);
     return true;
   },
   operation: async (user, { maker, config }) => {
