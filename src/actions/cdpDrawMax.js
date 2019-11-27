@@ -20,19 +20,13 @@ export default {
       : MDAI(0);
 
     //Use frob directly to avoid a drip()
-    const method = 'frob';
-    const args = [
+    await manager.proxyActions.frob(
       managerAddress,
       cdp.id,
       ETH(0).toFixed('wei'),
       amount.toFixed('wei'),
-      {
-        dsProxy: true,
-        value: 0
-      }
-    ].filter(x => x);
-
-    await manager.proxyActions[method](...args);
+      { dsProxy: true, value: 0 }
+    );
   },
   after: () => {},
   category: 'cdp'

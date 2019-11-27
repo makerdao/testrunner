@@ -5,7 +5,7 @@ export default {
   before: (_, { config }) => {
     config.ilk = config && config.ilk ? config.ilk : 'ETH-A';
     config.collateral =
-      config && config.collateral ? config.collateral : ETH(1);
+      config && config.collateral ? config.collateral : ETH(4);
     return true;
   },
   operation: async (user, { maker, config }) => {
@@ -28,19 +28,13 @@ export default {
       ? cdp.daiAvailable.shiftedBy(27).div(ilkInfo.rate)
       : MDAI(0);
 
-    const method = 'frob';
-    const args = [
+    await manager.proxyActions.frob(
       managerAddress,
       cdp.id,
       ETH(0).toFixed('wei'),
       amount.toFixed('wei'),
-      {
-        dsProxy: true,
-        value: 0
-      }
-    ].filter(x => x);
-
-    await manager.proxyActions[method](...args);
+      { dsProxy: true, value: 0 }
+    );
 
     //drip
     await maker
