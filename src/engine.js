@@ -73,7 +73,7 @@ export default class Engine {
             : parametrizedAction;
         const actionConfig =
           typeof parametrizedAction === 'object'
-            ? parametrizedAction[2] || {}
+            ? parametrizedAction[1] || {}
             : {};
         const importedAction = ACTIONS[actionName];
         assert(importedAction, `Could not import action: ${actionName}`);
@@ -193,7 +193,7 @@ export default class Engine {
     return filter(actions, async action => {
       const importedAction =
         ACTIONS[typeof action === 'object' ? action[0] : action];
-      const actionConfig = typeof action === 'object' ? action[2] || {} : {};
+      const actionConfig = typeof action === 'object' ? action[1] || {} : {};
       if (importedAction.precondition === undefined) return true;
       if (importedActor.address)
         this._maker.useAccountWithAddress(importedActor.address);
@@ -252,10 +252,10 @@ export default class Engine {
 
   _randomElement(list, seed) {
     const index = RandomWeights.chooseWeightedIndex(
-      list.map(a => a[1] || 1),
+      list.map(a => (typeof a[1] === 'object' ? a[1].weight : a[1]) || 1),
       seed
     );
-    return list[index]; //typeof list[index] === 'object' ? list[index][0] : list[index];
+    return list[index];
   }
 
   async _randomActionCheck(actions, actors, seed) {

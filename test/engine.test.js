@@ -328,7 +328,7 @@ test('run two iterations of a random test plan, yielding different results', asy
     actions: [
       [
         ['user1', 'user2', 'user3', 'user4', 'user5'],
-        [['checkUser', 10], ['checkUser', 90]]
+        [['checkUser', 10], ['checkRandom', { weight: 20 }]]
       ]
     ],
     seed: 1,
@@ -395,15 +395,15 @@ test('action with parameters', async () => {
       [
         'user1',
         [
-          ['checkParameters', 1000, { params1: 999 }],
-          ['checkParameters', 1, { params1: 999 }]
+          ['checkParameters', { weight: 1000, params1: 999 }],
+          ['checkParameters', { weight: 1, params1: 999 }]
         ]
       ],
       [
         'user1',
         [
-          ['checkParameters', 1000, { params1: 111 }],
-          ['checkParameters', 1, { params1: 111 }]
+          ['checkParameters', { weight: 1000, params1: 111 }],
+          ['checkParameters', { weight: 1, params1: 111 }]
         ]
       ]
     ]
