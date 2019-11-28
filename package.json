@@ -39,8 +39,6 @@
     "cli": "node ./src/cli"
   },
   "jest": {
-    "globalSetup": "<rootDir>/test/setup-global.js",
-    "globalTeardown": "<rootDir>/test/teardown-global.js",
     "transform": {
       "^.+\\.jsx?$": "babel-jest"
     }
