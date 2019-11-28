@@ -19,16 +19,7 @@ test('open cdp with parameters', async () => {
   const engine = new Engine({
     actors: { user1: 'selfTestUser' },
     actions: [
-      [
-        'user1',
-        [
-          [
-            'openCdp',
-            undefined,
-            { ilk: 'ETH-A', collateral: ETH(0.5), dai: 20 }
-          ]
-        ]
-      ]
+      ['user1', [['openCdp', { ilk: 'ETH-A', collateral: ETH(0.5), dai: 20 }]]]
     ],
     url: 'http://localhost:2000'
   });
