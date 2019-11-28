@@ -328,7 +328,7 @@ test('run two iterations of a random test plan, yielding different results', asy
     actions: [
       [
         ['user1', 'user2', 'user3', 'user4', 'user5'],
-        [['checkUser', 10], ['checkUser', 90]]
+        [['checkUser', 10], ['checkRandom', { weight: 20 }]]
       ]
     ],
     seed: 1,
@@ -384,4 +384,57 @@ test('context', async () => {
 
   const report = await engine.run();
   expect(report.results).toEqual([3, 9, 15]);
+});
+
+test('action with parameters', async () => {
+  const engine = new Engine({
+    actors: {
+      user1: 'selfTestUser'
+    },
+    actions: [
+      [
+        'user1',
+        [
+          ['checkParameters', { weight: 1000, params1: 999 }],
+          ['checkParameters', { weight: 1, params1: 999 }]
+        ]
+      ],
+      [
+        'user1',
+        [
+          ['checkParameters', { weight: 1000, params1: 111 }],
+          ['checkParameters', { weight: 1, params1: 111 }]
+        ]
+      ]
+    ]
+  });
+
+  const report = await engine.run();
+  expect(report.results[0].params1).toEqual(1000);
+  expect(report.results[1].params1).toEqual(112);
+});
+
+test('action with random parameters', async () => {
+  const engine = new Engine({
+    actors: {
+      user1: 'selfTestUser'
+    },
+    actions: [['user1', 'checkRandom']],
+    seed: 123121
+  });
+
+  const report = await engine.run();
+  expect(report.results[0]).toEqual(98);
+});
+
+test('async action', async () => {
+  const engine = new Engine({
+    actors: {
+      user1: 'selfTestUser'
+    },
+    actions: [['user1', ['checkAsync', 'checkAsync']]]
+  });
+
+  const report = await engine.run();
+  expect(report.success).toEqual(true);
 });

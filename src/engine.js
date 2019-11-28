@@ -80,14 +80,27 @@ export default class Engine {
     for (const action of actions) {
       if (!report.success) break;
       try {
-        let [actorName, actionName] = action;
+        let [actorName, parametrizedAction] = action;
+        const actionName =
+          typeof parametrizedAction === 'object'
+            ? parametrizedAction[0]
+            : parametrizedAction;
+        const actionConfig =
+          typeof parametrizedAction === 'object'
+            ? parametrizedAction[1] || {}
+            : {};
         const importedAction = ACTIONS[actionName];
         assert(importedAction, `Could not import action: ${actionName}`);
 
         const importedActor = actors[actorName];
         assert(importedActor, `Missing actor: ${actorName}`);
 
-        const result = await this._runAction(importedAction, importedActor);
+        const result = await this._runAction(
+          importedAction,
+          importedActor,
+          actionConfig,
+          iterationSeed
+        );
         report.results.push(result);
         report.completed.push(action);
       } catch (error) {
@@ -180,21 +193,23 @@ export default class Engine {
     // TODO
   }
 
-  async _runAction(action, actor) {
+  async _runAction(action, actor, config, seed) {
     const { before, operation, after } = action;
     if (actor.address) this._maker.useAccountWithAddress(actor.address);
 
     const beforeResult = before
-      ? await this._runStep(before.bind(action), actor)
+      ? await this._runStep(before.bind(action), actor, undefined, config, seed)
       : undefined;
-
     const result = await this._runStep(
       operation.bind(action),
       actor,
-      beforeResult
+      beforeResult,
+      config,
+      seed
     );
 
-    if (after) await this._runStep(after.bind(action), actor, result);
+    if (after)
+      await this._runStep(after.bind(action), actor, result, config, seed);
     return result;
   }
 
@@ -202,21 +217,26 @@ export default class Engine {
     return filter(actions, async action => {
       const importedAction =
         ACTIONS[typeof action === 'object' ? action[0] : action];
+      const actionConfig = typeof action === 'object' ? action[1] || {} : {};
       if (importedAction.precondition === undefined) return true;
       if (importedActor.address)
         this._maker.useAccountWithAddress(importedActor.address);
       return this._runStep(
         importedAction.precondition.bind(importedAction),
-        importedActor
+        importedActor,
+        undefined,
+        actionConfig
       );
     });
   }
 
-  _runStep(step, actor, lastResult) {
+  _runStep(step, actor, lastResult, config, seed) {
     return step(actor, {
       maker: this._maker,
       context: this._context,
-      lastResult
+      config,
+      lastResult,
+      seed
     });
   }
 
@@ -256,10 +276,10 @@ export default class Engine {
 
   _randomElement(list, seed) {
     const index = RandomWeights.chooseWeightedIndex(
-      list.map(a => a[1] || 1),
+      list.map(a => (typeof a[1] === 'object' ? a[1].weight : a[1]) || 1),
       seed
     );
-    return typeof list[index] === 'object' ? list[index][0] : list[index];
+    return list[index];
   }
 
   async _randomActionCheck(actions, actors, seed) {
@@ -269,10 +289,12 @@ export default class Engine {
       if (action.length === 1) {
         orderedActions.splice(index, 1, ...shuffle(action[0], seed));
       } else {
-        const selectedActor =
+        let selectedActor =
           typeof action[0] === 'object'
             ? this._randomElement(action[0], seed)
             : action[0];
+        selectedActor =
+          typeof selectedActor === 'object' ? selectedActor[0] : selectedActor;
         const selectedAction =
           typeof action[1] === 'object'
             ? this._randomElement(
