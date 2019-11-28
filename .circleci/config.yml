@@ -1,17 +1,19 @@
- version: 2
- jobs:
-   build:
-     docker:
-       - image: levity/dapptools-node
-     steps:
-       - checkout
-       - run:
+version: 2
+jobs:
+  build:
+    docker:
+      - image: levity/dapptools-node
+    steps:
+      - checkout
+      - run:
           name: Install dependencies
           command: |
             npm i --no-save yarn
             yarn
-       - run:
+      - run:
           name: Run tests
           command: |
             source /home/circleci/setup-env.sh
             yarn test
+            npm i --no-save codecov
+            codecov
