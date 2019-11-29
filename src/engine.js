@@ -295,14 +295,18 @@ export default class Engine {
             : action[0];
         selectedActor =
           typeof selectedActor === 'object' ? selectedActor[0] : selectedActor;
-        const selectedAction =
-          typeof action[1] === 'object'
-            ? this._randomElement(
-                await this._filterActions(action[1], actors[selectedActor]),
-                seed
-              )
-            : action[1];
-        orderedActions.splice(index, 1, [selectedActor, selectedAction]);
+        const selectedAction = this._randomElement(
+          await this._filterActions(
+            typeof action[1] === 'object' ? action[1] : [action[1]],
+            actors[selectedActor]
+          ),
+          seed
+        );
+        if (selectedAction) {
+          orderedActions.splice(index, 1, [selectedActor, selectedAction]);
+        } else {
+          orderedActions.splice(index, 1);
+        }
       }
     }
     return orderedActions;
