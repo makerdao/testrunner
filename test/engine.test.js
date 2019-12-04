@@ -102,6 +102,29 @@ test('fail before w/ continue on failure', async () => {
   });
 });
 
+test('fail before w/ continueOnFailure', async () => {
+  const engine = new Engine({
+    actors: { user1: 'selfTestUser' },
+    actions: [
+      ['user1', 'checkUser'],
+      ['user1', 'failBefore'],
+      ['user1', 'checkUser']
+    ],
+    continueOnFailure: true
+  });
+  const report = await engine.run();
+
+  expect(report).toEqual({
+    success: true,
+    results: ['0xa', -1, '0xa'],
+    completed: [
+      ['user1', 'checkUser'],
+      ['user1', 'failBefore'],
+      ['user1', 'checkUser']
+    ]
+  });
+});
+
 test('fail during', async () => {
   const engine = new Engine({
     actors: { user1: 'selfTestUser' },
@@ -152,6 +175,29 @@ test('fail during w/ continue on failure', async () => {
         rngStatus: expect.any(String)
       }
     ],
+    completed: [
+      ['user1', 'checkUser'],
+      ['user1', 'failDuring'],
+      ['user1', 'checkUser']
+    ]
+  });
+});
+
+test('fail during w/ continueOnFailure', async () => {
+  const engine = new Engine({
+    actors: { user1: 'selfTestUser' },
+    actions: [
+      ['user1', 'checkUser'],
+      ['user1', 'failDuring'],
+      ['user1', 'checkUser']
+    ],
+    continueOnFailure: true
+  });
+  const report = await engine.run();
+
+  expect(report).toEqual({
+    success: true,
+    results: ['0xa', -1, '0xa'],
     completed: [
       ['user1', 'checkUser'],
       ['user1', 'failDuring'],
