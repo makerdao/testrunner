@@ -100,7 +100,12 @@ export default class Engine {
         report.results.push(result);
         report.completed.push(action);
       } catch (error) {
-        return failAtIndex(report.results.length, error);
+        if (this._options.continueOnFailure) {
+          report.results.push(-1);
+          report.completed.push(action);
+        } else {
+          return failAtIndex(report.results.length, error);
+        }
       }
     }
   }
