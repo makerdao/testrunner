@@ -1,9 +1,7 @@
 import { ETH, MDAI } from '@makerdao/dai-plugin-mcd';
-import seedrandom from 'seedrandom';
 
 export default {
-  before: (_, { config, seed }) => {
-    const rng = seedrandom(seed);
+  before: (_, { config, rng }) => {
     config.ilk = config.ilk ? config.ilk : 'ETH-A';
     config.collateral = config.collateral ? config.collateral : ETH(rng());
     config.dai = config.dai ? config.dai : 20 + rng() * 10;

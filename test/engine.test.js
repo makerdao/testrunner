@@ -424,7 +424,7 @@ test('action with random parameters', async () => {
   });
 
   const report = await engine.run();
-  expect(report.results[0]).toEqual(98);
+  expect(report.results[0]).toEqual(56);
 });
 
 test('async action', async () => {
