@@ -4,12 +4,11 @@ import PLANS from './plans';
 import ALERTERS from './alerters';
 import createClient from './testchain';
 import assert from 'assert';
-import shuffle from 'knuth-shuffle-seeded';
+import prng from '../src/prng';
 import castArray from 'lodash/castArray';
 import Maker from '@makerdao/dai';
 import McdPlugin from '@makerdao/dai-plugin-mcd';
 import debug from 'debug';
-import RandomWeights from 'random-seed-weighted-chooser';
 import fs from 'fs';
 import path from 'path';
 import { filter } from './helpers/utils';
@@ -51,15 +50,14 @@ export default class Engine {
       options.iterations = 1;
     }
 
+    this.rng = new prng({ seed: options.seed });
+
     this._options = options;
   }
 
   async _runOnce(report, i, failAtIndex) {
-    const iterationSeed = this._options.seed
-      ? this._options.seed + i
-      : undefined;
     const plan = this._options.plans
-      ? this._importPlans(this._options.plans, iterationSeed)
+      ? this._importPlans(this._options.plans)
       : null;
 
     let actors;
@@ -72,8 +70,7 @@ export default class Engine {
 
     const actions = await this._randomActionCheck(
       this._options.actions || plan.actions,
-      actors,
-      iterationSeed
+      actors
     );
 
     log('running actions...');
@@ -98,8 +95,7 @@ export default class Engine {
         const result = await this._runAction(
           importedAction,
           importedActor,
-          actionConfig,
-          iterationSeed
+          actionConfig
         );
         report.results.push(result);
         report.completed.push(action);
@@ -193,23 +189,21 @@ export default class Engine {
     // TODO
   }
 
-  async _runAction(action, actor, config, seed) {
+  async _runAction(action, actor, config) {
     const { before, operation, after } = action;
     if (actor.address) this._maker.useAccountWithAddress(actor.address);
 
     const beforeResult = before
-      ? await this._runStep(before.bind(action), actor, undefined, config, seed)
+      ? await this._runStep(before.bind(action), actor, undefined, config)
       : undefined;
     const result = await this._runStep(
       operation.bind(action),
       actor,
       beforeResult,
-      config,
-      seed
+      config
     );
 
-    if (after)
-      await this._runStep(after.bind(action), actor, result, config, seed);
+    if (after) await this._runStep(after.bind(action), actor, result, config);
     return result;
   }
 
@@ -230,13 +224,13 @@ export default class Engine {
     });
   }
 
-  _runStep(step, actor, lastResult, config, seed) {
+  _runStep(step, actor, lastResult, config) {
     return step(actor, {
       maker: this._maker,
       context: this._context,
       config,
       lastResult,
-      seed
+      rng: this.rng
     });
   }
 
@@ -257,7 +251,7 @@ export default class Engine {
     return result;
   }
 
-  _importPlans(plans, seed) {
+  _importPlans(plans) {
     return plans.reduce(
       (result, plan) => {
         const importedPlan = PLANS[plan];
@@ -265,7 +259,7 @@ export default class Engine {
         result.actors = { ...result.actors, ...importedPlan.actors };
         const actions =
           importedPlan.mode === 'random'
-            ? shuffle(importedPlan.actions, seed)
+            ? this.rng.shuffle(importedPlan.actions)
             : importedPlan.actions;
         result.actions = result.actions.concat(actions);
         return result;
@@ -274,24 +268,27 @@ export default class Engine {
     );
   }
 
-  _randomElement(list, seed) {
-    const index = RandomWeights.chooseWeightedIndex(
-      list.map(a => (typeof a[1] === 'object' ? a[1].weight : a[1]) || 1),
-      seed
+  _randomElement(list) {
+    const index = this.rng.randomWeightedIndex(
+      list.map(a =>
+        typeof a === 'string'
+          ? 1
+          : (typeof a[1] === 'object' ? a[1].weight : a[1]) || 1
+      )
     );
     return list[index];
   }
 
-  async _randomActionCheck(actions, actors, seed) {
+  async _randomActionCheck(actions, actors) {
     let orderedActions = [...actions];
     for (const index in orderedActions) {
       const action = orderedActions[index];
       if (action.length === 1) {
-        orderedActions.splice(index, 1, ...shuffle(action[0], seed));
+        orderedActions.splice(index, 1, ...this.rng.shuffle(action[0]));
       } else {
         let selectedActor =
           typeof action[0] === 'object'
-            ? this._randomElement(action[0], seed)
+            ? this._randomElement(action[0])
             : action[0];
         selectedActor =
           typeof selectedActor === 'object' ? selectedActor[0] : selectedActor;
@@ -299,8 +296,7 @@ export default class Engine {
           await this._filterActions(
             typeof action[1] === 'object' ? action[1] : [action[1]],
             actors[selectedActor]
-          ),
-          seed
+          )
         );
         if (selectedAction) {
           orderedActions.splice(index, 1, [selectedActor, selectedAction]);
