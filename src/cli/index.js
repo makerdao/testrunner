@@ -5,6 +5,7 @@ args
   .option('--alert <type>', 'alerter type [console, rocketchat]', 'console')
   .option('--alert-level <level>', 'alert level [info, error]', 'info')
   .option('-c, --config <file>', 'config file name')
+  .option('--continue', 'continue running the test plan on errors')
   .option(
     '-i, --iterations <num>',
     'repeat the testplan <num> times. 0 is infinite',
