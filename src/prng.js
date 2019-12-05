@@ -5,9 +5,8 @@ export default class prng {
   constructor(options = {}) {
     this.rng = seedrandom(options.seed, {
       state:
-        options.state || options.base64State
-          ? this._decodeB64State(options.base64State)
-          : true
+        options.state ||
+        (options.base64State ? this._decodeB64State(options.base64State) : true)
     });
   }
 
@@ -17,15 +16,19 @@ export default class prng {
 
   _decodeB64State(compactState) {
     return decode(
-      new Uint8Array([...atob(compactState)].map(char => char.charCodeAt(0)))
+      new Uint8Array(
+        [...Buffer.from(compactState, 'base64').toString('binary')].map(char =>
+          char.charCodeAt(0)
+        )
+      )
     );
-    //return decode(atob(compactState).charCodeAt(0));
   }
 
   base64State() {
-    //console.log(encode(this.state()));
-    //console.log(btoa(String.fromCharCode(...encode(this.state()))))
-    return btoa(String.fromCharCode(...encode(this.state())));
+    return Buffer.from(
+      String.fromCharCode(...encode(this.state())),
+      'binary'
+    ).toString('base64');
   }
 
   shuffle(array) {
@@ -37,6 +40,7 @@ export default class prng {
   }
 
   randomWeightedIndex(array) {
+    if (array.length === 0) return 0;
     const sumWeights = array.reduce((a, c) => a + c);
     const pick = this.rng() * sumWeights;
     let sum = 0;
