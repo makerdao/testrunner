@@ -58,14 +58,16 @@ test('fail before', async () => {
   expect(report).toEqual({
     success: false,
     error: expect.any(Error),
-    errorIndex: 1,
+    index: 1,
+    iteration: 0,
     results: ['0xa'],
-    completed: [['user1', 'checkUser']]
+    completed: [['user1', 'checkUser']],
+    rngStatus: expect.any(String)
   });
   expect(report.error.message).toEqual('failure in before');
 });
 
-test('fail before w/ continueOnFailure', async () => {
+test('fail before w/ continue on failure', async () => {
   const engine = new Engine({
     actors: { user1: 'selfTestUser' },
     actions: [
@@ -73,13 +75,13 @@ test('fail before w/ continueOnFailure', async () => {
       ['user1', 'failBefore'],
       ['user1', 'checkUser']
     ],
-    continueOnFailure: true
+    continue: true
   });
   const report = await engine.run();
 
   expect(report).toEqual({
     success: true,
-    results: ['0xa', -1, '0xa'],
+    results: ['0xa', expect.any(Error), '0xa'],
     completed: [
       ['user1', 'checkUser'],
       ['user1', 'failBefore'],
@@ -102,14 +104,16 @@ test('fail during', async () => {
   expect(report).toEqual({
     success: false,
     error: expect.any(Error),
-    errorIndex: 1,
+    index: 1,
+    iteration: 0,
     results: ['0xa'],
-    completed: [['user1', 'checkUser']]
+    completed: [['user1', 'checkUser']],
+    rngStatus: expect.any(String)
   });
   expect(report.error.message).toEqual('failure in operation');
 });
 
-test('fail during w/ continueOnFailure', async () => {
+test('fail during w/ continue on failure', async () => {
   const engine = new Engine({
     actors: { user1: 'selfTestUser' },
     actions: [
@@ -117,13 +121,13 @@ test('fail during w/ continueOnFailure', async () => {
       ['user1', 'failDuring'],
       ['user1', 'checkUser']
     ],
-    continueOnFailure: true
+    continue: true
   });
   const report = await engine.run();
 
   expect(report).toEqual({
     success: true,
-    results: ['0xa', -1, '0xa'],
+    results: ['0xa', expect.any(Error), '0xa'],
     completed: [
       ['user1', 'checkUser'],
       ['user1', 'failDuring'],
@@ -141,9 +145,11 @@ test("each step gets previous step's return value", async () => {
   expect(report).toEqual({
     success: false,
     error: expect.objectContaining({ message: 'value is not 3' }),
-    errorIndex: 0,
+    index: 0,
+    iteration: 0,
     results: [],
-    completed: []
+    completed: [],
+    rngStatus: expect.any(String)
   });
 });
 
@@ -161,9 +167,11 @@ test('fail after', async () => {
   expect(report).toEqual({
     success: false,
     error: expect.any(Error),
-    errorIndex: 1,
+    index: 1,
+    iteration: 0,
     results: ['0xa'],
-    completed: [['user1', 'checkUser']]
+    completed: [['user1', 'checkUser']],
+    rngStatus: expect.any(String)
   });
   expect(report.error.message).toEqual('failure in after');
 });

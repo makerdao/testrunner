@@ -29,7 +29,7 @@ export default class Engine {
       'Must provide { plans } OR { actors, actions }, but not both'
     );
 
-    // Check if config file exist and accesible
+    // Check if config file exist and accessible
     if (options.config) {
       options.config = path.resolve(options.config);
       assert(fs.existsSync(options.config), 'Configuration file must exist');
@@ -55,17 +55,34 @@ export default class Engine {
     this._options = options;
   }
 
+  async _verboseReport(actorName, actionName, iteration, index, result, error) {
+    if (this._options.verbose) {
+      let report = {
+        results: [result],
+        success: true,
+        completed: [actorName, actionName],
+        iteration,
+        index
+      };
+      if (error) {
+        report.error = error.message;
+        report.rngStatus = this.rng.base64State();
+      }
+      await this.alert(this._options.alertLevel, this._options.alert, report);
+    }
+  }
+
   async _runOnce(report, i, failAtIndex) {
     const plan = this._options.plans
       ? this._importPlans(this._options.plans)
       : null;
-
+    let planIndex = 0;
     let actors;
     log('importing actors...');
     try {
       actors = await this._importActors(this._options.actors || plan.actors);
     } catch (error) {
-      return failAtIndex(-1, error);
+      return failAtIndex(i, -1, error);
     }
 
     const actions = await this._randomActionCheck(
@@ -76,8 +93,8 @@ export default class Engine {
     log('running actions...');
     for (const action of actions) {
       if (!report.success) break;
+      let [actorName, parametrizedAction] = action;
       try {
-        let [actorName, parametrizedAction] = action;
         const actionName =
           typeof parametrizedAction === 'object'
             ? parametrizedAction[0]
@@ -99,14 +116,30 @@ export default class Engine {
         );
         report.results.push(result);
         report.completed.push(action);
+        await this._verboseReport(
+          actorName,
+          parametrizedAction,
+          i,
+          planIndex,
+          result
+        );
       } catch (error) {
-        if (this._options.continueOnFailure) {
-          report.results.push(-1);
+        await this._verboseReport(
+          actorName,
+          parametrizedAction,
+          i,
+          planIndex,
+          -1,
+          error
+        );
+        if (this._options.continue) {
+          report.results.push(error);
           report.completed.push(action);
         } else {
-          return failAtIndex(report.results.length, error);
+          return failAtIndex(i, planIndex, error);
         }
       }
+      planIndex++;
     }
   }
 
@@ -124,10 +157,12 @@ export default class Engine {
       success: true,
       completed: []
     });
-    const failAtIndex = (index, error) => {
+    const failAtIndex = (iteration, index, error) => {
       report.success = false;
       report.error = error;
-      report.errorIndex = index;
+      report.iteration = iteration;
+      report.index = index;
+      report.rngStatus = this.rng.base64State();
       return report;
     };
 
@@ -164,7 +199,7 @@ export default class Engine {
         this._maker = await Maker.create('http', options);
         log('succeeded in setting up maker instance.');
       } catch (error) {
-        return failAtIndex(-1, error);
+        return failAtIndex(-1, -1, error);
       }
     }
 
@@ -179,14 +214,14 @@ export default class Engine {
 
   // `level` is similar to log levels -- e.g. if the level is "error", an
   // alerter should not produce any output unless there's an error
-  async alert(level, alerters) {
-    assert(this.report, 'Nothing to alert on yet');
+  async alert(level, alerters, report) {
+    assert(report, 'Nothing to alert on yet');
 
     alerters = castArray(alerters);
     for (const name of alerters) {
       const factory = ALERTERS[name];
       assert(factory, `Unrecognized alerter name: ${name}`);
-      await factory()(level, this.report);
+      await factory()(level, report);
     }
   }
 
