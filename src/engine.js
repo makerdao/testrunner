@@ -92,7 +92,6 @@ export default class Engine {
 
     log('running actions...');
     for (const action of actions) {
-      if (!report.success) break;
       let [actorName, parametrizedAction] = action;
       try {
         const actionName =
@@ -132,11 +131,12 @@ export default class Engine {
           -1,
           error
         );
+        failAtIndex(i, planIndex, error);
         if (this._options.continue) {
-          report.results.push(error);
+          report.results.push(undefined);
           report.completed.push(action);
         } else {
-          return failAtIndex(i, planIndex, error);
+          return;
         }
       }
       planIndex++;
@@ -159,10 +159,13 @@ export default class Engine {
     });
     const failAtIndex = (iteration, index, error) => {
       report.success = false;
-      report.error = error;
-      report.iteration = iteration;
-      report.index = index;
-      report.rngStatus = this.rng.base64State();
+      report.errors = report.errors || [];
+      report.errors.push({
+        error,
+        iteration,
+        index,
+        rngStatus: this.rng.base64State()
+      });
       return report;
     };
 
