@@ -93,6 +93,7 @@ export default class Engine {
     log('running actions...');
     for (const action of actions) {
       let [actorName, parametrizedAction] = action;
+      if (parametrizedAction === undefined) continue;
       try {
         const actionName =
           typeof parametrizedAction === 'object'
@@ -344,7 +345,7 @@ export default class Engine {
         if (selectedAction) {
           orderedActions.splice(index, 1, [selectedActor, selectedAction]);
         } else {
-          orderedActions.splice(index, 1);
+          orderedActions.splice(index, 1, []);
         }
       }
     }
