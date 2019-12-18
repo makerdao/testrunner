@@ -50,7 +50,7 @@ export default class Engine {
       options.iterations = 1;
     }
 
-    this.rng = new prng({ seed: options.seed });
+    this.rng = new prng({ seed: options.seed, base64State: options.prng });
 
     this._options = options;
   }
