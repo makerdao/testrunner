@@ -57,12 +57,49 @@ test('fail before', async () => {
 
   expect(report).toEqual({
     success: false,
-    error: expect.any(Error),
-    errorIndex: 1,
+    errors: [
+      {
+        error: expect.any(Error),
+        index: 1,
+        iteration: 0,
+        rngStatus: expect.any(String)
+      }
+    ],
     results: ['0xa'],
     completed: [['user1', 'checkUser']]
   });
-  expect(report.error.message).toEqual('failure in before');
+  expect(report.errors[0].error.message).toEqual('failure in before');
+});
+
+test('fail before w/ continue on failure', async () => {
+  const engine = new Engine({
+    actors: { user1: 'selfTestUser' },
+    actions: [
+      ['user1', 'checkUser'],
+      ['user1', 'failBefore'],
+      ['user1', 'checkUser']
+    ],
+    continue: true
+  });
+  const report = await engine.run();
+
+  expect(report).toEqual({
+    success: false,
+    results: ['0xa', undefined, '0xa'],
+    errors: [
+      {
+        error: expect.any(Error),
+        index: 1,
+        iteration: 0,
+        rngStatus: expect.any(String)
+      }
+    ],
+    completed: [
+      ['user1', 'checkUser'],
+      ['user1', 'failBefore'],
+      ['user1', 'checkUser']
+    ]
+  });
 });
 
 test('fail during', async () => {
@@ -78,12 +115,49 @@ test('fail during', async () => {
 
   expect(report).toEqual({
     success: false,
-    error: expect.any(Error),
-    errorIndex: 1,
+    errors: [
+      {
+        error: expect.any(Error),
+        index: 1,
+        iteration: 0,
+        rngStatus: expect.any(String)
+      }
+    ],
     results: ['0xa'],
     completed: [['user1', 'checkUser']]
   });
-  expect(report.error.message).toEqual('failure in operation');
+  expect(report.errors[0].error.message).toEqual('failure in operation');
+});
+
+test('fail during w/ continue on failure', async () => {
+  const engine = new Engine({
+    actors: { user1: 'selfTestUser' },
+    actions: [
+      ['user1', 'checkUser'],
+      ['user1', 'failDuring'],
+      ['user1', 'checkUser']
+    ],
+    continue: true
+  });
+  const report = await engine.run();
+
+  expect(report).toEqual({
+    success: false,
+    results: ['0xa', undefined, '0xa'],
+    errors: [
+      {
+        error: expect.any(Error),
+        index: 1,
+        iteration: 0,
+        rngStatus: expect.any(String)
+      }
+    ],
+    completed: [
+      ['user1', 'checkUser'],
+      ['user1', 'failDuring'],
+      ['user1', 'checkUser']
+    ]
+  });
 });
 
 test("each step gets previous step's return value", async () => {
@@ -94,8 +168,14 @@ test("each step gets previous step's return value", async () => {
   const report = await engine.run();
   expect(report).toEqual({
     success: false,
-    error: expect.objectContaining({ message: 'value is not 3' }),
-    errorIndex: 0,
+    errors: [
+      {
+        error: expect.objectContaining({ message: 'value is not 3' }),
+        index: 0,
+        iteration: 0,
+        rngStatus: expect.any(String)
+      }
+    ],
     results: [],
     completed: []
   });
@@ -114,12 +194,18 @@ test('fail after', async () => {
 
   expect(report).toEqual({
     success: false,
-    error: expect.any(Error),
-    errorIndex: 1,
+    errors: [
+      {
+        error: expect.any(Error),
+        index: 1,
+        iteration: 0,
+        rngStatus: expect.any(String)
+      }
+    ],
     results: ['0xa'],
     completed: [['user1', 'checkUser']]
   });
-  expect(report.error.message).toEqual('failure in after');
+  expect(report.errors[0].error.message).toEqual('failure in after');
 });
 
 test('randomize nested actions', async () => {
@@ -424,7 +510,31 @@ test('action with random parameters', async () => {
   });
 
   const report = await engine.run();
-  expect(report.results[0]).toEqual(98);
+  expect(report.results[0]).toEqual(56);
+});
+
+test('action with parameters and failing precondition', async () => {
+  const engine = new Engine({
+    actors: {
+      user1: 'selfTestUser',
+      user2: 'selfTestUser',
+      user3: 'selfTestUser',
+      user4: 'selfTestUser',
+      user5: 'selfTestUser'
+    },
+    actions: [
+      [['user1', 'user2', 'user3'], 'checkUser'],
+      [['user2'], [['runIfUser1', { weight: 1, params1: 999 }]]],
+      [
+        ['user1', 'user2', 'user3', 'user4', 'user5'],
+        [['checkParameters', { weight: 1, params1: 111 }]]
+      ]
+    ]
+  });
+
+  const report = await engine.run();
+  expect(report.success).toEqual(true);
+  expect(report.results[2].params1).toEqual(112);
 });
 
 test('async action', async () => {

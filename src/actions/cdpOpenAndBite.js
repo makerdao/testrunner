@@ -2,6 +2,13 @@ import { ETH, MDAI } from '@makerdao/dai-plugin-mcd';
 import { stringToBytes } from '../helpers/utils';
 
 export default {
+  precondition: async (user, { maker, config }) => {
+    config.collateral = config.collateral || ETH(1);
+    return (await maker
+      .service('token')
+      .getToken(config.collateral.symbol)
+      .balance()).gte(config.collateral);
+  },
   before: (_, { config }) => {
     config.ilk = config && config.ilk ? config.ilk : 'ETH-A';
     config.collateral =
