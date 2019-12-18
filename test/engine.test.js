@@ -513,6 +513,30 @@ test('action with random parameters', async () => {
   expect(report.results[0]).toEqual(56);
 });
 
+test('action with parameters and failing precondition', async () => {
+  const engine = new Engine({
+    actors: {
+      user1: 'selfTestUser',
+      user2: 'selfTestUser',
+      user3: 'selfTestUser',
+      user4: 'selfTestUser',
+      user5: 'selfTestUser'
+    },
+    actions: [
+      [['user1', 'user2', 'user3'], 'checkUser'],
+      [['user2'], [['runIfUser1', { weight: 1, params1: 999 }]]],
+      [
+        ['user1', 'user2', 'user3', 'user4', 'user5'],
+        [['checkParameters', { weight: 1, params1: 111 }]]
+      ]
+    ]
+  });
+
+  const report = await engine.run();
+  expect(report.success).toEqual(true);
+  expect(report.results[2].params1).toEqual(112);
+});
+
 test('async action', async () => {
   const engine = new Engine({
     actors: {
