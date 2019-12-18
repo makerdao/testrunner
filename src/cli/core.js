@@ -14,7 +14,7 @@ export default async function main(options) {
     await engine.stop();
     if (!success) console.log('Plan run did not succeed.');
 
-    await engine.alert(options.alertLevel, options.alert, engine.report);
+    await engine.alert(options.alertLevel, options.alert);
 
     // this might need to change, in order to distinguish between plan run
     // failures and errors in the testrunner itself; perhaps we should only

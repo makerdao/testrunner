@@ -4,11 +4,12 @@ import PLANS from './plans';
 import ALERTERS from './alerters';
 import createClient from './testchain';
 import assert from 'assert';
-import prng from '../src/prng';
+import shuffle from 'knuth-shuffle-seeded';
 import castArray from 'lodash/castArray';
 import Maker from '@makerdao/dai';
 import McdPlugin from '@makerdao/dai-plugin-mcd';
 import debug from 'debug';
+import RandomWeights from 'random-seed-weighted-chooser';
 import fs from 'fs';
 import path from 'path';
 import { filter } from './helpers/utils';
@@ -29,7 +30,7 @@ export default class Engine {
       'Must provide { plans } OR { actors, actions }, but not both'
     );
 
-    // Check if config file exist and accessible
+    // Check if config file exist and accesible
     if (options.config) {
       options.config = path.resolve(options.config);
       assert(fs.existsSync(options.config), 'Configuration file must exist');
@@ -50,51 +51,36 @@ export default class Engine {
       options.iterations = 1;
     }
 
-    this.rng = new prng({ seed: options.seed, base64State: options.prng });
-
     this._options = options;
   }
 
-  async _verboseReport(actorName, actionName, iteration, index, result, error) {
-    if (this._options.verbose) {
-      let report = {
-        results: [result],
-        success: true,
-        completed: [actorName, actionName],
-        iteration,
-        index
-      };
-      if (error) {
-        report.error = error.message;
-        report.rngStatus = this.rng.base64State();
-      }
-      await this.alert(this._options.alertLevel, this._options.alert, report);
-    }
-  }
-
   async _runOnce(report, i, failAtIndex) {
+    const iterationSeed = this._options.seed
+      ? this._options.seed + i
+      : undefined;
     const plan = this._options.plans
-      ? this._importPlans(this._options.plans)
+      ? this._importPlans(this._options.plans, iterationSeed)
       : null;
-    let planIndex = 0;
+
     let actors;
     log('importing actors...');
     try {
       actors = await this._importActors(this._options.actors || plan.actors);
     } catch (error) {
-      return failAtIndex(i, -1, error);
+      return failAtIndex(-1, error);
     }
 
     const actions = await this._randomActionCheck(
       this._options.actions || plan.actions,
-      actors
+      actors,
+      iterationSeed
     );
 
     log('running actions...');
     for (const action of actions) {
-      let [actorName, parametrizedAction] = action;
-      if (parametrizedAction === undefined) continue;
+      if (!report.success) break;
       try {
+        let [actorName, parametrizedAction] = action;
         const actionName =
           typeof parametrizedAction === 'object'
             ? parametrizedAction[0]
@@ -112,35 +98,14 @@ export default class Engine {
         const result = await this._runAction(
           importedAction,
           importedActor,
-          actionConfig
+          actionConfig,
+          iterationSeed
         );
         report.results.push(result);
         report.completed.push(action);
-        await this._verboseReport(
-          actorName,
-          parametrizedAction,
-          i,
-          planIndex,
-          result
-        );
       } catch (error) {
-        await this._verboseReport(
-          actorName,
-          parametrizedAction,
-          i,
-          planIndex,
-          -1,
-          error
-        );
-        failAtIndex(i, planIndex, error);
-        if (this._options.continue) {
-          report.results.push(undefined);
-          report.completed.push(action);
-        } else {
-          return;
-        }
+        return failAtIndex(report.results.length, error);
       }
-      planIndex++;
     }
   }
 
@@ -158,15 +123,10 @@ export default class Engine {
       success: true,
       completed: []
     });
-    const failAtIndex = (iteration, index, error) => {
+    const failAtIndex = (index, error) => {
       report.success = false;
-      report.errors = report.errors || [];
-      report.errors.push({
-        error,
-        iteration,
-        index,
-        rngStatus: this.rng.base64State()
-      });
+      report.error = error;
+      report.errorIndex = index;
       return report;
     };
 
@@ -203,7 +163,7 @@ export default class Engine {
         this._maker = await Maker.create('http', options);
         log('succeeded in setting up maker instance.');
       } catch (error) {
-        return failAtIndex(-1, -1, error);
+        return failAtIndex(-1, error);
       }
     }
 
@@ -218,14 +178,14 @@ export default class Engine {
 
   // `level` is similar to log levels -- e.g. if the level is "error", an
   // alerter should not produce any output unless there's an error
-  async alert(level, alerters, report) {
-    assert(report, 'Nothing to alert on yet');
+  async alert(level, alerters) {
+    assert(this.report, 'Nothing to alert on yet');
 
     alerters = castArray(alerters);
     for (const name of alerters) {
       const factory = ALERTERS[name];
       assert(factory, `Unrecognized alerter name: ${name}`);
-      await factory()(level, report);
+      await factory()(level, this.report);
     }
   }
 
@@ -233,21 +193,23 @@ export default class Engine {
     // TODO
   }
 
-  async _runAction(action, actor, config) {
+  async _runAction(action, actor, config, seed) {
     const { before, operation, after } = action;
     if (actor.address) this._maker.useAccountWithAddress(actor.address);
 
     const beforeResult = before
-      ? await this._runStep(before.bind(action), actor, undefined, config)
+      ? await this._runStep(before.bind(action), actor, undefined, config, seed)
       : undefined;
     const result = await this._runStep(
       operation.bind(action),
       actor,
       beforeResult,
-      config
+      config,
+      seed
     );
 
-    if (after) await this._runStep(after.bind(action), actor, result, config);
+    if (after)
+      await this._runStep(after.bind(action), actor, result, config, seed);
     return result;
   }
 
@@ -268,13 +230,13 @@ export default class Engine {
     });
   }
 
-  _runStep(step, actor, lastResult, config) {
+  _runStep(step, actor, lastResult, config, seed) {
     return step(actor, {
       maker: this._maker,
       context: this._context,
       config,
       lastResult,
-      rng: this.rng
+      seed
     });
   }
 
@@ -295,7 +257,7 @@ export default class Engine {
     return result;
   }
 
-  _importPlans(plans) {
+  _importPlans(plans, seed) {
     return plans.reduce(
       (result, plan) => {
         const importedPlan = PLANS[plan];
@@ -303,7 +265,7 @@ export default class Engine {
         result.actors = { ...result.actors, ...importedPlan.actors };
         const actions =
           importedPlan.mode === 'random'
-            ? this.rng.shuffle(importedPlan.actions)
+            ? shuffle(importedPlan.actions, seed)
             : importedPlan.actions;
         result.actions = result.actions.concat(actions);
         return result;
@@ -312,41 +274,35 @@ export default class Engine {
     );
   }
 
-  _randomElement(list) {
-    const index = this.rng.randomWeightedIndex(
-      list.map(a =>
-        typeof a === 'string'
-          ? 1
-          : (typeof a[1] === 'object' ? a[1].weight : a[1]) || 1
-      )
+  _randomElement(list, seed) {
+    const index = RandomWeights.chooseWeightedIndex(
+      list.map(a => (typeof a[1] === 'object' ? a[1].weight : a[1]) || 1),
+      seed
     );
     return list[index];
   }
 
-  async _randomActionCheck(actions, actors) {
+  async _randomActionCheck(actions, actors, seed) {
     let orderedActions = [...actions];
     for (const index in orderedActions) {
       const action = orderedActions[index];
       if (action.length === 1) {
-        orderedActions.splice(index, 1, ...this.rng.shuffle(action[0]));
+        orderedActions.splice(index, 1, ...shuffle(action[0], seed));
       } else {
         let selectedActor =
           typeof action[0] === 'object'
-            ? this._randomElement(action[0])
+            ? this._randomElement(action[0], seed)
             : action[0];
         selectedActor =
           typeof selectedActor === 'object' ? selectedActor[0] : selectedActor;
-        const selectedAction = this._randomElement(
-          await this._filterActions(
-            typeof action[1] === 'object' ? action[1] : [action[1]],
-            actors[selectedActor]
-          )
-        );
-        if (selectedAction) {
-          orderedActions.splice(index, 1, [selectedActor, selectedAction]);
-        } else {
-          orderedActions.splice(index, 1, []);
-        }
+        const selectedAction =
+          typeof action[1] === 'object'
+            ? this._randomElement(
+                await this._filterActions(action[1], actors[selectedActor]),
+                seed
+              )
+            : action[1];
+        orderedActions.splice(index, 1, [selectedActor, selectedAction]);
       }
     }
     return orderedActions;

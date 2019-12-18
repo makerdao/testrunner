@@ -1,7 +1,6 @@
 import Engine from '../src/engine';
 
 test('cdp wipe and free', async () => {
-  jest.setTimeout(20000);
   const engine = new Engine({
     actors: { user1: 'selfTestUser' },
     actions: [
