@@ -43,5 +43,6 @@ test('Run cdp action only if there is enough collateral in account', async () =>
   });
   const report = await engine.run();
   expect(report.success).toBeTruthy();
-  expect(report.completed.length).toBe(1);
+  expect(report.results[0]).toBe(undefined);
+  expect(report.results.length).toBe(1);
 });
