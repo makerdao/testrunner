@@ -93,7 +93,11 @@ export default class Engine {
     log('running actions...');
     for (const action of actions) {
       let [actorName, parametrizedAction] = action;
-      if (parametrizedAction === undefined) continue;
+      if (parametrizedAction === undefined) {
+        report.results.push(undefined);
+        report.completed.push(action);
+        continue;
+      }
       try {
         const actionName =
           typeof parametrizedAction === 'object'
