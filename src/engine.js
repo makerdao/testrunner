@@ -50,12 +50,19 @@ export default class Engine {
       options.iterations = 1;
     }
 
-    this.rng = new prng({ seed: options.seed, base64State: options.prng });
+    this._rng = new prng({ seed: options.seed, base64State: options.prng });
 
     this._options = options;
   }
 
-  async _verboseReport(actorName, actionName, iteration, index, result, error) {
+  async _alertIfVerbose(
+    actorName,
+    actionName,
+    iteration,
+    index,
+    result,
+    error
+  ) {
     if (this._options.verbose) {
       let report = {
         results: [result],
@@ -66,7 +73,7 @@ export default class Engine {
       };
       if (error) {
         report.error = error.message;
-        report.rngStatus = this.rng.base64State();
+        report.rngStatus = this._rng.base64State();
       }
       await this.alert(this._options.alertLevel, this._options.alert, report);
     }
@@ -120,7 +127,7 @@ export default class Engine {
         );
         report.results.push(result);
         report.completed.push(action);
-        await this._verboseReport(
+        await this._alertIfVerbose(
           actorName,
           parametrizedAction,
           i,
@@ -128,7 +135,7 @@ export default class Engine {
           result
         );
       } catch (error) {
-        await this._verboseReport(
+        await this._alertIfVerbose(
           actorName,
           parametrizedAction,
           i,
@@ -169,7 +176,7 @@ export default class Engine {
         error,
         iteration,
         index,
-        rngStatus: this.rng.base64State()
+        rngStatus: this._rng.base64State()
       });
       return report;
     };
@@ -278,7 +285,7 @@ export default class Engine {
       context: this._context,
       config,
       lastResult,
-      rng: this.rng
+      rng: this._rng
     });
   }
 
@@ -307,7 +314,7 @@ export default class Engine {
         result.actors = { ...result.actors, ...importedPlan.actors };
         const actions =
           importedPlan.mode === 'random'
-            ? this.rng.shuffle(importedPlan.actions)
+            ? this._rng.shuffle(importedPlan.actions)
             : importedPlan.actions;
         result.actions = result.actions.concat(actions);
         return result;
@@ -317,7 +324,7 @@ export default class Engine {
   }
 
   _randomElement(list) {
-    const index = this.rng.randomWeightedIndex(
+    const index = this._rng.randomWeightedIndex(
       list.map(a =>
         typeof a === 'string'
           ? 1
@@ -332,7 +339,7 @@ export default class Engine {
     for (const index in orderedActions) {
       const action = orderedActions[index];
       if (action.length === 1) {
-        orderedActions.splice(index, 1, ...this.rng.shuffle(action[0]));
+        orderedActions.splice(index, 1, ...this._rng.shuffle(action[0]));
       } else {
         let selectedActor =
           typeof action[0] === 'object'
